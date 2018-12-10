@@ -1,0 +1,30 @@
+#项目名称、版权年份
+zkml:
+  name:ZKML
+  copyrightYear:2018
+
+#日志配置
+logging:
+  level:
+    com.ruoyi: debug
+    org.springframework: WARN
+    org.spring.springboot.dao: debug
+
+  #netty配置
+  netty:
+    tcpport:31292  #tcp协议端口
+    bossThread:1
+    workerThread:2
+    keepalive:true
+    backlog:1024
+
+  #memcached缓存配置
+  memcached:
+    servers: 36.7.87.75:11211  #服务器列表
+    weight: 5  #权重
+    initConn: 20  #初始化连接数
+    minConn: 10  #最小连接数
+    maxConn: 50  #最大连接数
+    maintSleep: 3000  #连接池守护线程的睡眠时间
+    nagle: false  #TCP参数
+    socketTo: 3000  #连接超时
