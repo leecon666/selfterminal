@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper">
+    <resultMap id="BaseResultMap"
+               type="com.zkml.terminal.service.selfterminal.model.SelfTerminal">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="sn" jdbcType="VARCHAR" property="sn"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="version" jdbcType="VARCHAR" property="version"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="cpu_usage_rate" jdbcType="VARCHAR" property="cpuUsageRate"/>
+        <result column="memory_usage_rate" jdbcType="VARCHAR" property="memoryUsageRate"/>
+        <result column="areaid" jdbcType="VARCHAR" property="areaid"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="port" jdbcType="INTEGER" property="port"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="check_sn" jdbcType="VARCHAR" property="checkSn"/>
+        <result column="logic_delete" jdbcType="INTEGER" property="logicDelete"/>
+        <result column="company_id" jdbcType="INTEGER" property="companyId"/>
+        <result column="time" jdbcType="VARCHAR" property="time"/>
+    </resultMap>
+    <!--根据终端号查询自助终端-->
+    <select id="querySelfTerminalBySn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+          id, sn, type, version, status, create_time,update_time, cpu_usage_rate, memory_usage_rate, areaid,
+          ip, port, url, check_sn, logic_delete,company_id,time
+        from self_terminal_new
+        where sn = #{sn,jdbcType=VARCHAR}
+    </select>
+    <!--终端参数设置-->
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.zkml.terminal.service.selfterminal.model.SelfTerminal">
+        update self_terminal_new
+        <set>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cpuUsageRate != null">
+                cpu_usage_rate = #{cpuUsageRate,jdbcType=VARCHAR},
+            </if>
+            <if test="memoryUsageRate != null">
+                memory_usage_rate = #{memoryUsageRate,jdbcType=VARCHAR},
+            </if>
+            <if test="areaid != null">
+                areaid = #{areaid,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                ip = #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="port != null">
+                port = #{port,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="checkSn != null">
+                check_sn = #{checkSn,jdbcType=VARCHAR},
+            </if>
+            <if test="logicDelete != null">
+                logic_delete = #{logicDelete,jdbcType=INTEGER},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where  sn = #{sn,jdbcType=VARCHAR}
+    </update>
+</mapper>

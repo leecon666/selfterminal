@@ -6,6 +6,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -16,6 +18,8 @@ import java.util.concurrent.TimeUnit;
  * @Date: Created in  2018/12/10 12:43
  * @Description:netty服务端
  */
+@SpringBootApplication
+@MapperScan("com.zkml.terminal.thread.selfterminal.dao")
 @Slf4j
 public class NettyServer {
     public static void main(String[] args) {

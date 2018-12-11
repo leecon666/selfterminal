@@ -1,6 +1,6 @@
 package com.zkml.terminal.service.selfterminal.nettyserver;
 
-import com.zkml.terminal.service.selfterminal.service.SelfTerminalServiceThread;
+import com.zkml.terminal.service.selfterminal.thread.SelfTerminalServiceThread;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 

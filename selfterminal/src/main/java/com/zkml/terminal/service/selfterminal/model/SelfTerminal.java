@@ -1,4 +1,4 @@
-package com.zkml.terminal.service.selfterminal.entity;
+package com.zkml.terminal.service.selfterminal.model;
 
 import lombok.Data;
 
