@@ -1,8 +1,10 @@
 package com.zkml.terminal.service.selfterminal.thread;
 
+import com.whalin.MemCached.MemCachedClient;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
+import com.zkml.terminal.service.selfterminal.util.ParseMessageUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class SelfTerminalServiceThread implements Runnable {
     @Autowired
     @Qualifier("selfTerminalService")
     private ISelfTerminalService selfTerminalService;
+    @Autowired
+    private MemCachedClient memCachedClient;
     private String command;
     private ChannelHandlerContext ctx;
 
@@ -40,10 +44,33 @@ public class SelfTerminalServiceThread implements Runnable {
                 if (resultMap != null && !resultMap.isEmpty()) {
                     switch (message.getMessageId()) {
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
+                            String key = "command" + sn;
+                            if (memCachedClient != null && memCachedClient.keyExists(sn)) {
+                                Object msg = memCachedClient.get(sn);
+                                if (msg != null) {
+                                    String msgStr = msg.toString();
+                                    if (msgStr.indexOf("|") != -1) {
+                                        String[] msgArray = msgStr.split("\\|");
+                                        for (int i = 0; i < msgArray.length; i++) {
+                                            ParseMessageUtil.sendMessage(ctx, msgArray[i], sn);
+                                        }
+                                    } else {
+                                        ParseMessageUtil.sendMessage(ctx, msgStr, sn);
+                                    }
+                                }
+                                memCachedClient.delete(key);
+                            }
+                            log.info("终端({})定时上报", sn);
+                            ParseMessageUtil.parseMessage(message);
+                            selfTerminalService.settingTerminalParams(message);
                             break;
                         case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
+                            ParseMessageUtil.parseMessage(message);
                             break;
                         case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
+                            log.info("查询终端({})参数应答", sn);
+                            ParseMessageUtil.parseMessage(message);
+                            selfTerminalService.settingTerminalParams(message);
                             break;
                         default:
                             break;

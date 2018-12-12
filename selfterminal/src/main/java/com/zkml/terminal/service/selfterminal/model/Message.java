@@ -25,11 +25,12 @@ public class Message {
     private String ip; // TCP服务的IP
     private Integer port; // TCP服务的端口号
     private String areaid;// 区域ID
+    private String areaCode;// 区域区号
 
     public Message(String command) {
         this.messageId = command.substring(4);
         this.messageBodyLength = Integer.parseInt(command.substring(4, 8), 16);
-        this.sn = ASCIIUtil.convertHexASCToStr(command.substring(8, 32));
+        this.sn = ASCIIUtil.convertHexStrToString(command.substring(8, 32));
         this.messageBody = command.substring(32, command.length() - 2);
     }
 }

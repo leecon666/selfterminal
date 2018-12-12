@@ -52,6 +52,9 @@ public class MessageDecoder extends ByteToMessageDecoder {
      */
     public static final String bytesToHexString(byte[] bytes) {
         StringBuffer sb = new StringBuffer(bytes.length);
+        if (bytes == null || bytes.length <= 0) {
+            return null;
+        }
         String str;
         for (int i = 0; i < bytes.length; i++) {
             str = Integer.toHexString(0xFF & bytes[i]);

@@ -1,5 +1,6 @@
 package com.zkml.terminal.service.selfterminal.util;
 
+
 public class ASCIIUtil {
     public static String convertStringToHex(String str) {
 
@@ -43,4 +44,22 @@ public class ASCIIUtil {
         checkCode = checkCode.length() < 2 ? "0" + checkCode : checkCode;
         return checkCode;
     }
+
+    public static String convertHexStrToString(String str) {
+        if (str == null || str.equals("")) {
+            return null;
+        }
+        if ((str.length()) % 2 > 0) {
+            throw new NumberFormatException("Input string was not in a correct format");
+        }
+        byte[] buffer = new byte[str.length() / 2];
+        int i = 2;
+        while (i < str.length()) {
+            buffer[i / 2] = (byte) Integer.parseInt(str.substring(i, i + 2), 16);
+            i += 2;
+        }
+        str = new String(buffer);
+        return str;
+    }
+
 }

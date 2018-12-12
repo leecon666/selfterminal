@@ -22,7 +22,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg != null && !msg.equals("")) {
+        if (msg != null && !msg.toString().equals("")) {
             threadPoolExecutor.execute(new SelfTerminalServiceThread(msg.toString(), ctx));
         } else {
             log.error("接收的指令为空");

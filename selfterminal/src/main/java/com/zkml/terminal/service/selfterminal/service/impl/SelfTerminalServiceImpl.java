@@ -19,7 +19,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
     @Autowired
     private SelfTerminalMapper selfTerminalMapper;
     @Autowired
-    private static MemCachedClient memCachedClient;
+    private MemCachedClient memCachedClient;
 
     /**
      * @Description:根据终端号查询终端参数
