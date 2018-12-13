@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @Description:netty服务端
  */
 @SpringBootApplication
-@MapperScan("com.zkml.terminal.thread.selfterminal.dao")
+@MapperScan("com.zkml.terminal.service.selfterminal.dao")
 @Slf4j
 public class NettyServer {
     public static void main(String[] args) {

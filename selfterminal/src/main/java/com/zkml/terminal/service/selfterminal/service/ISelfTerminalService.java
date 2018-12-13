@@ -22,5 +22,5 @@ public interface ISelfTerminalService {
      * @Date: 2018/12/11 10:58
      * @param: parseMessageUtil
      */
-    int settingTerminalParams(Message message);
+    void settingTerminalParams(Message message);
 }

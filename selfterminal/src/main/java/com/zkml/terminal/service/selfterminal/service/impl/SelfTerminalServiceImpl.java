@@ -56,7 +56,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
      * @param: message
      */
     @Override
-    public int settingTerminalParams(Message message) {
+    public void settingTerminalParams(Message message) {
         String sn = message.getSn();
         String messageId = message.getMessageId();
         String version = message.getVersion();
@@ -66,6 +66,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         String url = message.getUrl();
         String ip = message.getIp();
         Integer port = message.getPort();
+        String areaid = message.getAreaid();
+        Integer companyId = message.getCompanyId();
         Object obj = memCachedClient.get(sn);
         switch (messageId) {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
@@ -108,6 +110,19 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             default:
                 break;
         }
-        return 0;
+        SelfTerminal selfTerminal = new SelfTerminal();
+        selfTerminal.setSn(sn);
+        selfTerminal.setVersion(version);
+        selfTerminal.setUrl(url);
+        selfTerminal.setIp(ip);
+        selfTerminal.setPort(port);
+        selfTerminal.setAreaid(areaid);
+        selfTerminal.setCompanyId(companyId);
+        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
+        if (result > 0) {
+            log.info("终端({})参数设置成功", sn);
+        } else {
+            log.info("终端({})参数设置失败", sn);
+        }
     }
 }

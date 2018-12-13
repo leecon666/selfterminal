@@ -1,7 +1,6 @@
 package com.zkml.terminal.service.selfterminal.util;
 
 import com.zkml.terminal.service.selfterminal.model.Message;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -114,7 +113,13 @@ public class ParseMessageUtil {
         }
         return sb.toString();
     }
-
+/**
+ * @Description:解析附加信息
+ * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.parseExtraInfo
+ * @Author: likun
+ * @Date: 2018/12/13 9:27
+ * @param: extraInfo
+ */
     public static Map<String, String> parseExtraInfo(String extraInfo) {
         Map<String, String> map = new HashMap<String, String>();
         while (extraInfo != null && !extraInfo.equals("")) {
