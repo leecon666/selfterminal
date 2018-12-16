@@ -1,5 +1,6 @@
 package com.zkml.terminal.service.selfterminal.thread;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.whalin.MemCached.MemCachedClient;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
@@ -45,9 +46,10 @@ public class SelfTerminalServiceThread implements Runnable {
                     switch (message.getMessageId()) {
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                             String key = "command" + sn;
-                            if (memCachedClient != null && memCachedClient.keyExists(sn)) {
-                                Object msg = memCachedClient.get(sn);
+                            if (memCachedClient != null && memCachedClient.keyExists(key)) {
+                                Object msg = memCachedClient.get(key);
                                 if (msg != null) {
+                                    log.info("指令："+JSONUtils.toJSONString(msg));
                                     String msgStr = msg.toString();
                                     if (msgStr.indexOf("|") != -1) {
                                         String[] msgArray = msgStr.split("\\|");

@@ -30,22 +30,25 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
      */
     @Override
     public Map<String, String> querySelfTerminalBySn(String sn) {
-        if (memCachedClient != null && memCachedClient.keyExists(sn)) {
-            Object obj = memCachedClient.get(sn);
-            return (Map<String, String>) obj;
+        if (memCachedClient != null) {
+            if (memCachedClient.keyExists(sn)) {
+                Object obj = memCachedClient.get(sn);
+                return (Map<String, String>) obj;
+            }
+            SelfTerminal selfTerminal = selfTerminalMapper.querySelfTerminalBySn(sn);
+            Map<String, String> map = new HashMap<>();
+            map.put("areaid", selfTerminal.getAreaid());
+            map.put("version", selfTerminal.getVersion());
+            map.put("ip", selfTerminal.getIp());
+            map.put("port", selfTerminal.getPort().toString());
+            map.put("url", selfTerminal.getUrl());
+            map.put("cpuUsageRate", "");
+            map.put("memoryUsageRate", "");
+            map.put("time", "");
+            memCachedClient.add(sn, map);
+            return map;
         }
-        SelfTerminal selfTerminal = selfTerminalMapper.querySelfTerminalBySn(sn);
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("areaid", selfTerminal.getAreaid());
-        map.put("version", selfTerminal.getVersion());
-        map.put("ip", selfTerminal.getIp());
-        map.put("port", selfTerminal.getPort() + "");
-        map.put("url", selfTerminal.getUrl());
-        map.put("cpuUsageRate", "0");
-        map.put("memoryUsageRate", "0");
-        map.put("time", "");
-        memCachedClient.add(sn, map);
-        return map;
+        return null;
     }
 
     /**
@@ -68,61 +71,63 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         Integer port = message.getPort();
         String areaid = message.getAreaid();
         Integer companyId = message.getCompanyId();
-        Object obj = memCachedClient.get(sn);
-        switch (messageId) {
-            case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
-                if (obj != null) {
-                    Map<String, String> resultMap = (Map<String, String>) obj;
-                    if (cpuUsageRate != null && !cpuUsageRate.equals("")) {
-                        resultMap.put("cpuUsageRate", cpuUsageRate);
+        if (memCachedClient != null) {
+            Object obj = memCachedClient.get(sn);
+            switch (messageId) {
+                case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
+                    if (obj != null) {
+                        Map<String, String> resultMap = (Map<String, String>) obj;
+                        if (cpuUsageRate != null && !cpuUsageRate.equals("")) {
+                            resultMap.put("cpuUsageRate", cpuUsageRate);
+                        }
+                        if (memoryUsageRate != null && !memoryUsageRate.equals("")) {
+                            resultMap.put("memoryUsageRate", memoryUsageRate);
+                        }
+                        if (time != null && !time.equals("")) {
+                            resultMap.put("time", time);
+                        }
+                        if (version != null && !version.equals("")) {
+                            resultMap.put("version", version);
+                        }
+                        memCachedClient.set(sn, resultMap);
                     }
-                    if (memoryUsageRate != null && !memoryUsageRate.equals("")) {
-                        resultMap.put("memoryUsageRate", memoryUsageRate);
+                    log.info("自助终端（{}）时间（{}）CPU占用率（{}） 内存用量（{}）版本（{}）", sn, time, cpuUsageRate, memoryUsageRate, version);
+                    break;
+                case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
+                    break;
+                case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
+                    if (obj != null) {
+                        Map<String, String> resultMap = (Map<String, String>) obj;
+                        if (url != null && !url.equals("")) {
+                            resultMap.put("url", url);
+                        }
+                        if (ip != null && !ip.equals("")) {
+                            resultMap.put("ip", ip);
+                        }
+                        if (port != null) {
+                            resultMap.put("port", port.toString());
+                        }
+                        memCachedClient.set(sn, resultMap);
                     }
-                    if (time != null && !time.equals("")) {
-                        resultMap.put("time", time);
-                    }
-                    if (version != null && !version.equals("")) {
-                        resultMap.put("version", version);
-                    }
-                    memCachedClient.set(sn, resultMap);
-                }
-                log.info("自助终端（{}）时间（{}）CPU占用率（{}） 内存用量（{}）版本（{}）", sn, time, cpuUsageRate, memoryUsageRate, version);
-                break;
-            case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
-                break;
-            case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
-                if (obj != null) {
-                    Map<String, String> resultMap = (Map<String, String>) obj;
-                    if (url != null && !url.equals("")) {
-                        resultMap.put("url", url);
-                    }
-                    if (ip != null && !ip.equals("")) {
-                        resultMap.put("ip", ip);
-                    }
-                    if (port != null) {
-                        resultMap.put("port", port + "");
-                    }
-                    memCachedClient.set(sn, resultMap);
-                }
-                log.info("自助终端（{}）Web服务请求地址（{}） ip地址（{}） 端口号（{}）", sn, url, ip, port);
-                break;
-            default:
-                break;
-        }
-        SelfTerminal selfTerminal = new SelfTerminal();
-        selfTerminal.setSn(sn);
-        selfTerminal.setVersion(version);
-        selfTerminal.setUrl(url);
-        selfTerminal.setIp(ip);
-        selfTerminal.setPort(port);
-        selfTerminal.setAreaid(areaid);
-        selfTerminal.setCompanyId(companyId);
-        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
-        if (result > 0) {
-            log.info("终端({})参数设置成功", sn);
-        } else {
-            log.info("终端({})参数设置失败", sn);
+                    log.info("自助终端（{}）Web服务请求地址（{}） ip地址（{}） 端口号（{}）", sn, url, ip, port);
+                    break;
+                default:
+                    break;
+            }
+            SelfTerminal selfTerminal = new SelfTerminal();
+            selfTerminal.setSn(sn);
+            selfTerminal.setVersion(version);
+            selfTerminal.setUrl(url);
+            selfTerminal.setIp(ip);
+            selfTerminal.setPort(port);
+            selfTerminal.setAreaid(areaid);
+            selfTerminal.setCompanyId(companyId);
+            int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
+            if (result > 0) {
+                log.info("终端({})参数设置成功", sn);
+            } else {
+                log.info("终端({})参数设置失败", sn);
+            }
         }
     }
 }

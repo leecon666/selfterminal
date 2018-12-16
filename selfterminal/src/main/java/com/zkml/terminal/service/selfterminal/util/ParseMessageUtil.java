@@ -31,7 +31,7 @@ public class ParseMessageUtil {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                 String version = messageBody.substring(0, 8);
                 String time = parseTime(messageBody.substring(8, 20));
-                String extraInfo = messageBody.substring(20);//附加信息
+                String extraInfo = messageBody.substring(20,2*messageBodyLength+20);//附加信息
                 Map<String, String> map = parseExtraInfo(extraInfo);
                 if (!CollectionUtils.isEmpty(map)) {
                     if (map.containsKey("01")) {
@@ -121,7 +121,7 @@ public class ParseMessageUtil {
  * @param: extraInfo
  */
     public static Map<String, String> parseExtraInfo(String extraInfo) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         while (extraInfo != null && !extraInfo.equals("")) {
             String commandId = extraInfo.substring(0, 2);
             int length = Integer.parseInt(extraInfo.substring(2, 4), 16);
@@ -175,9 +175,9 @@ public class ParseMessageUtil {
         future.addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture future) {
                 if (future.isSuccess()) {
-                    log.info("终端号({})发送({})指令成功", msg, sn);
+                    log.info("终端号({})发送({})指令成功", sn, msg);
                 } else {
-                    log.error("终端号({})发送({})指令失败", msg, sn);
+                    log.error("终端号({})发送({})指令失败", sn, msg);
                 }
             }
         });
