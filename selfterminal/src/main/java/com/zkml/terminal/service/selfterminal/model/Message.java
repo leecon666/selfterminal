@@ -31,7 +31,7 @@ public class Message {
     public Message(String command) {
         this.messageId = command.substring(4);
         this.messageBodyLength = Integer.parseInt(command.substring(4, 8), 16);
-        this.sn = ASCIIUtil.convertHexStrToString(command.substring(8, 32));
+        this.sn = ASCIIUtil.convertHexASCToStr(command.substring(8, 32));
         this.messageBody = command.substring(32, command.length() - 2);
     }
 }

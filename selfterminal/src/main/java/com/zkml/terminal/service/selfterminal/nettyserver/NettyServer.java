@@ -7,6 +7,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,16 +22,19 @@ import java.util.concurrent.TimeUnit;
  */
 @SpringBootApplication
 @MapperScan("com.zkml.terminal.service.selfterminal.dao")
+@EnableAutoConfiguration
 @Slf4j
 public class NettyServer {
     public static void main(String[] args) {
+        SpringApplication.run(NettyServer.class, args);
         //bossGroup线程监听端口，workerGroup线程负责数据读写
         EventLoopGroup bossGroup = null;
         EventLoopGroup workerGroup = null;
         try {
             log.info("启动自助终端服务");
             LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue<Runnable>();
-            final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 1000, 3000, TimeUnit.MILLISECONDS, linkedBlockingQueue);
+            final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 1000, 3000, TimeUnit
+                    .MILLISECONDS, linkedBlockingQueue);
             bossGroup = new NioEventLoopGroup();
             workerGroup = new NioEventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();

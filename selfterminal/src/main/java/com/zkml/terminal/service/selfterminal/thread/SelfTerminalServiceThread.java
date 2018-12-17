@@ -10,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import java.util.Map;
  * @Description:自助终端服务线程
  */
 @Slf4j
+@Component
 public class SelfTerminalServiceThread implements Runnable {
     @Autowired
     @Qualifier("selfTerminalService")

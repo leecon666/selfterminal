@@ -30,8 +30,8 @@ public class ParseMessageUtil {
         switch (message.getMessageId()) {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                 String version = messageBody.substring(0, 8);
-                String time = parseTime(messageBody.substring(8, 20));
-                String extraInfo = messageBody.substring(20,2*messageBodyLength+20);//附加信息
+                String time = messageBody.substring(8, 20);
+                String extraInfo = messageBody.substring(20, 2 * messageBodyLength + 20);//附加信息
                 Map<String, String> map = parseExtraInfo(extraInfo);
                 if (!CollectionUtils.isEmpty(map)) {
                     if (map.containsKey("01")) {
@@ -103,23 +103,13 @@ public class ParseMessageUtil {
         }
     }
 
-    public static String parseTime(String time) {
-        StringBuilder sb = new StringBuilder("");
-        if (time != null && !time.equals("")) {
-            time = time.replaceAll("(.{2})", "$1 ").trim();//每两位插入空格
-            String[] str = time.split(" ");
-            sb.append("20").append(str[0]).append("-").append(str[1]).append("-").append(str[2]).append("-").append
-                    (str[3]).append("-").append(str[4]).append("-").append(str[5]);
-        }
-        return sb.toString();
-    }
-/**
- * @Description:解析附加信息
- * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.parseExtraInfo
- * @Author: likun
- * @Date: 2018/12/13 9:27
- * @param: extraInfo
- */
+    /**
+     * @Description:解析附加信息
+     * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.parseExtraInfo
+     * @Author: likun
+     * @Date: 2018/12/13 9:27
+     * @param: extraInfo
+     */
     public static Map<String, String> parseExtraInfo(String extraInfo) {
         Map<String, String> map = new HashMap<>();
         while (extraInfo != null && !extraInfo.equals("")) {
@@ -132,6 +122,13 @@ public class ParseMessageUtil {
         return map;
     }
 
+    /**
+     * @Description:根据消息ID获取消息名称
+     * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.getMessageNameByMsgId
+     * @Author: likun
+     * @Date: 2018/12/17 19:31
+     * @param: messageId消息ID
+     */
     public static String getMessageNameByMsgId(String messageId) {
         String messageName = null;
         switch (messageId) {
@@ -169,6 +166,15 @@ public class ParseMessageUtil {
         return messageName;
     }
 
+    /**
+     * @Description:发送消息
+     * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.sendMessage
+     * @Author: likun
+     * @Date: 2018/12/17 19:31
+     * @param: ctx环境
+     * @param: msg消息
+     * @param: sn终端号
+     */
     public static void sendMessage(ChannelHandlerContext ctx, String msg, String sn) {
         ChannelFuture future = ctx.channel().close();
         //服务端发送数据完毕后,关闭通道

@@ -40,9 +40,7 @@ mybatis:
     # 搜索指定包别名
     typeAliasesPackage: com.zkml.terminal.thread.selfterminal
     # 配置mapper的扫描，找到所有的mapper.xml映射文件
-    mapperLocations: classpath:mybatis/**/*Mapper.xml
-    # 加载全局的配置文件
-    configLocation: classpath:mybatis/mybatis-config.xml
+    mapperLocations: classpath:mybatis/*Mapper.xml
 
 #日志配置
 logging:
@@ -51,13 +49,14 @@ logging:
     org.springframework: WARN
     org.spring.springboot.dao: debug
 
-  #netty配置
-  netty:
-    tcpport:31292  #tcp协议端口
-    bossThread:1
-    workerThread:2
-    keepalive:true
-    backlog:1024
+#netty配置
+netty:
+  tcpport: 31292 #tcp协议端口
+  bossThread: 1
+  workerThread: 2
+  keepalive: true #保持连接
+  backlog: 1024*1024 #保持连接数
+  nodelay: true #有数据立即发送
 
   #memcached缓存配置
   memcached:
