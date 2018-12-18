@@ -7,7 +7,7 @@ zkml:
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://36.7.87.75:3308/vbox-maintenance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
     username: root
     password: 123456
@@ -55,16 +55,16 @@ netty:
   bossThread: 1
   workerThread: 2
   keepalive: true #保持连接
-  backlog: 1024*1024 #保持连接数
+  backlog: 1024 #保持连接数
   nodelay: true #有数据立即发送
 
   #memcached缓存配置
-  memcached:
-    servers: 36.7.87.75:11211  #服务器列表
-    weight: 5  #权重
-    initConn: 20  #初始化连接数
-    minConn: 10  #最小连接数
-    maxConn: 50  #最大连接数
-    maintSleep: 3000  #连接池守护线程的睡眠时间
-    nagle: false  #TCP参数
-    socketTo: 3000  #连接超时
+memcached:
+  servers: 36.7.87.75:11211  #服务器列表
+  weight: 5  #权重
+  initConn: 20  #初始化连接数
+  minConn: 10  #最小连接数
+  maxConn: 50  #最大连接数
+  maintSleep: 3000  #连接池守护线程的睡眠时间
+  nagle: false  #TCP参数
+  socketTo: 3000  #连接超时

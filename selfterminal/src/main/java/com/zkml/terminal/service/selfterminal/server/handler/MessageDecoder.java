@@ -1,4 +1,4 @@
-package com.zkml.terminal.service.selfterminal.nettyserver;
+package com.zkml.terminal.service.selfterminal.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,7 +24,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                 byte[] datas = new byte[len];
                 byteBuf.readBytes(datas);
                 String result = bytesToHexString(datas);
-                if (result != null && !result.equals("") && result.startsWith("564B")) {
+                if (result != null && !result.equals("")) {
                     int bodyLength = Integer.parseInt(result.substring(8, 12), 16);
                     String messageBody = result.substring(36, result.length() - 2);
                     int messageBodyLength = messageBody.length();

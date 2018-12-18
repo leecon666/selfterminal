@@ -7,6 +7,7 @@ import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
 import com.zkml.terminal.service.selfterminal.util.ParseMessageUtil;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +21,9 @@ import java.util.Map;
  * @Description:自助终端服务线程
  */
 @Slf4j
+@Data
 @Component
+@Qualifier("selfTerminalServiceThread")
 public class SelfTerminalServiceThread implements Runnable {
     @Autowired
     @Qualifier("selfTerminalService")
@@ -30,14 +33,9 @@ public class SelfTerminalServiceThread implements Runnable {
     private String command;
     private ChannelHandlerContext ctx;
 
-    public SelfTerminalServiceThread(String command, ChannelHandlerContext ctx) {
-        this.command = command;
-        this.ctx = ctx;
-    }
-
     @Override
     public void run() {
-        log.info("接受终端发来的指令({})", this.command);
+        log.info("接收终端发来的指令({})", this.command);
         if (command != null && !command.equals("")) {
             command = command.substring(4);
             Message message = new Message(command);
@@ -51,7 +49,7 @@ public class SelfTerminalServiceThread implements Runnable {
                             if (memCachedClient != null && memCachedClient.keyExists(key)) {
                                 Object msg = memCachedClient.get(key);
                                 if (msg != null) {
-                                    log.info("指令："+JSONUtils.toJSONString(msg));
+                                    log.info("指令：" + JSONUtils.toJSONString(msg));
                                     String msgStr = msg.toString();
                                     if (msgStr.indexOf("|") != -1) {
                                         String[] msgArray = msgStr.split("\\|");
@@ -75,6 +73,9 @@ public class SelfTerminalServiceThread implements Runnable {
                             log.info("查询终端({})参数应答", sn);
                             ParseMessageUtil.parseMessage(message);
                             selfTerminalService.settingTerminalParams(message);
+                            break;
+                        case MessageIdUtil.TERMINAL_CONTROL://终端控制
+                            log.info("终端控制");
                             break;
                         default:
                             break;

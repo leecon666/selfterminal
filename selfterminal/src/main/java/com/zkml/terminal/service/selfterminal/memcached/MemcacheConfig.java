@@ -16,7 +16,7 @@ public class MemcacheConfig {
     @Autowired
     private MemcachedPoolConfig memcachedPoolConfig;
 
-    @Bean
+    @Bean(name = "sockIOPool")
     public SockIOPool sockIOPool() {
         /** 获取连接池的实例 */
         SockIOPool pool = SockIOPool.getInstance();
@@ -37,7 +37,7 @@ public class MemcacheConfig {
         return pool;
     }
 
-    @Bean
+    @Bean(name = "memCachedClient")
     public MemCachedClient memCachedClient() {
         return new MemCachedClient();
     }

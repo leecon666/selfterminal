@@ -30,15 +30,15 @@ public class ParseMessageUtil {
         switch (message.getMessageId()) {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                 String version = messageBody.substring(0, 8);
-                String time = messageBody.substring(8, 20);
-                String extraInfo = messageBody.substring(20, 2 * messageBodyLength + 20);//附加信息
+                String time = parseTime(messageBody.substring(8, 20));
+                String extraInfo = messageBody.substring(20, 2 * messageBodyLength);//附加信息
                 Map<String, String> map = parseExtraInfo(extraInfo);
                 if (!CollectionUtils.isEmpty(map)) {
                     if (map.containsKey("01")) {
-                        message.setCpuUsageRate(ASCIIUtil.convertHexStrToString(map.get("01")));
+                        message.setCpuUsageRate(Integer.parseInt(map.get("01"),16));
                     }
                     if (map.containsKey("02")) {
-                        message.setMemoryUsageRate(ASCIIUtil.convertHexStrToString(map.get("02")));
+                        message.setMemoryUsageRate(Integer.parseInt(map.get("02"),16));
                     }
                 }
                 message.setTime(time);
@@ -116,8 +116,8 @@ public class ParseMessageUtil {
             String commandId = extraInfo.substring(0, 2);
             int length = Integer.parseInt(extraInfo.substring(2, 4), 16);
             String message = extraInfo.substring(4, 4 + length * 2);
-            map.put(commandId, message);
             extraInfo = extraInfo.substring(4 + length * 2);
+            map.put(commandId, message);
         }
         return map;
     }
@@ -187,5 +187,22 @@ public class ParseMessageUtil {
                 }
             }
         });
+    }
+    /**
+     * @Description:解析时间
+     * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.parseTime
+     * @Author: likun
+     * @Date: 2018/12/18 13:45
+     * @param: time
+     */
+    public static String parseTime(String time) {
+        StringBuilder sb = new StringBuilder("");
+        if (time != null && !time.equals("")) {
+            time = time.replaceAll("(.{2})", "$1 ").trim();//每两位插入空格
+            String[] str = time.split(" ");
+            sb.append("20").append(str[0]).append("-").append(str[1]).append("-").append(str[2]).append(" ").append
+                    (str[3]).append(":").append(str[4]).append(":").append(str[5]);
+        }
+        return sb.toString();
     }
 }

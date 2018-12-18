@@ -42,8 +42,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             map.put("ip", selfTerminal.getIp());
             map.put("port", selfTerminal.getPort().toString());
             map.put("url", selfTerminal.getUrl());
-            map.put("cpuUsageRate", "");
-            map.put("memoryUsageRate", "");
+            map.put("cpuUsageRate", "0");
+            map.put("memoryUsageRate", "0");
             map.put("time", "");
             memCachedClient.add(sn, map);
             return map;
@@ -63,8 +63,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         String sn = message.getSn();
         String messageId = message.getMessageId();
         String version = message.getVersion();
-        String cpuUsageRate = message.getCpuUsageRate();
-        String memoryUsageRate = message.getMemoryUsageRate();
+        Integer cpuUsageRate = message.getCpuUsageRate();
+        Integer memoryUsageRate = message.getMemoryUsageRate();
         String time = message.getTime();
         String url = message.getUrl();
         String ip = message.getIp();
@@ -77,11 +77,11 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                     if (obj != null) {
                         Map<String, String> resultMap = (Map<String, String>) obj;
-                        if (cpuUsageRate != null && !cpuUsageRate.equals("")) {
-                            resultMap.put("cpuUsageRate", cpuUsageRate);
+                        if (cpuUsageRate != null) {
+                            resultMap.put("cpuUsageRate", cpuUsageRate.toString());
                         }
-                        if (memoryUsageRate != null && !memoryUsageRate.equals("")) {
-                            resultMap.put("memoryUsageRate", memoryUsageRate);
+                        if (memoryUsageRate != null) {
+                            resultMap.put("memoryUsageRate", memoryUsageRate.toString());
                         }
                         if (time != null && !time.equals("")) {
                             resultMap.put("time", time);
@@ -91,7 +91,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                         }
                         memCachedClient.set(sn, resultMap);
                     }
-                    log.info("自助终端（{}）时间（{}）CPU占用率（{}） 内存用量（{}）版本（{}）", sn, time, cpuUsageRate, memoryUsageRate, version);
+                    log.info("自助终端（{}）时间（{}）CPU占用率（{}%） 内存用量（{}M）版本（{}）", sn, time, cpuUsageRate, memoryUsageRate,
+                            version);
                     break;
                 case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
                     break;
@@ -109,7 +110,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                         }
                         memCachedClient.set(sn, resultMap);
                     }
-                    log.info("自助终端（{}）Web服务请求地址（{}） ip地址（{}） 端口号（{}）", sn, url, ip, port);
+                    log.info("自助终端（{}）Web服务请求地址（{}）ip地址（{}）端口号（{}）", sn, url, ip, port);
                     break;
                 default:
                     break;
