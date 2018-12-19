@@ -4,7 +4,6 @@ import com.zkml.terminal.service.selfterminal.server.nettyserver.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -15,7 +14,6 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 @MapperScan("com.zkml.terminal.service.selfterminal.dao")
-@EnableAutoConfiguration
 @Slf4j
 public class ZKMLApplication {
     public static void main(String[] args) {

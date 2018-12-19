@@ -1,7 +1,5 @@
 package com.zkml.terminal.service.selfterminal.util;
 
-import java.io.ByteArrayOutputStream;
-
 /**
  * @Author: likun
  * @Date: Created in  2018/12/10 10:41

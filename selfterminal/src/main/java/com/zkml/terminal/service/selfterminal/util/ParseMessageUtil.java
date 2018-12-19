@@ -48,18 +48,18 @@ public class ParseMessageUtil {
                 String messageId = messageBody.substring(0, 4);
                 String messageName = getMessageNameByMsgId(messageId);
                 Integer result = Integer.parseInt(messageBody.substring(4, 6), 16);
-                StringBuilder builder = new StringBuilder("");
-                builder.append("终端号为").append(message.getSn()).append(",").append(messageName);
+                StringBuilder sb = new StringBuilder("");
+                sb.append("终端号为").append(message.getSn()).append(",").append(messageName);
                 if (result == 0) {
-                    builder.append("成功");
+                    sb.append("成功");
                 } else if (result == 1) {
-                    builder.append("失败");
+                    sb.append("失败");
                 } else if (result == 2) {
-                    builder.append("消息有误");
+                    sb.append("消息有误");
                 } else if (result == 3) {
-                    builder.append("不支持");
+                    sb.append("不支持");
                 }
-                log.info(builder.toString());
+                log.info(sb.toString());
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS://查询终端参数应答
                 messageBody = messageBody.substring(2);

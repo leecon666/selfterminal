@@ -1,13 +1,13 @@
 #项目名称、版权年份
 zkml:
-  name:ZKML
-  copyrightYear:2018
+ name: ZKML
+ copyrightYear: 2018
 
 #druid配置
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver
+    driverClassName: com.mysql.jdbc.Driver
     url: jdbc:mysql://36.7.87.75:3308/vbox-maintenance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
     username: root
     password: 123456
