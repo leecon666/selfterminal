@@ -5,14 +5,19 @@ import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import com.zkml.terminal.service.selfterminal.model.SelfTerminal;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
+import com.zkml.terminal.service.selfterminal.thread.MessageConsumer;
 import com.zkml.terminal.service.selfterminal.util.CommonUtil;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service("selfTerminalService")
 @Slf4j
@@ -21,6 +26,12 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
     private SelfTerminalMapper selfTerminalMapper;
     @Autowired
     private MemCachedClient memCachedClient;
+    @Autowired
+    @Qualifier("messageConsumer")
+    private MessageConsumer messageConsumer;
+    // 创建延时队列
+    DelayQueue<Message> queue = new DelayQueue<Message>();
+    ExecutorService e = Executors.newFixedThreadPool(1);
 
     /**
      * @Description:根据终端号查询终端参数
@@ -63,7 +74,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         String version = CommonUtil.formatStr(message.getVersion());
         Integer cpuUsageRate = message.getCpuUsageRate();
         Integer memoryUsageRate = message.getMemoryUsageRate();
-        String time = CommonUtil.formatStr(message.getTime());
+        String time = message.getTime();
         String url = CommonUtil.formatStr(message.getUrl());
         String ip = CommonUtil.formatStr(message.getIp());
         Integer port = message.getPort();
@@ -88,8 +99,45 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     }
                     memCachedClient.set(sn, map);
                 }
+                String oldVersion = selfTerminalMapper.querySelfTerminalBySn(sn).getVersion();
+                String versionStr = CommonUtil.formatStr(version);
+                String oldVersionStr = CommonUtil.formatStr(oldVersion);
+                if (!versionStr.equals("") && !oldVersionStr.equals("")) {
+                    if (!versionStr.equals(oldVersionStr)) {
+                        SelfTerminal selfTerminal1 = new SelfTerminal();
+                        selfTerminal1.setSn(sn);
+                        selfTerminal1.setVersion(versionStr);
+                        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
+                        if (result > 0) {
+                            log.info("终端({})版本设置成功", sn);
+                        } else {
+                            log.info("终端({})版本设置失败", sn);
+                        }
+                    }
+                }
                 log.info("自助终端（{}）时间（{}）CPU占用率（{}%） 内存用量（{}M）版本（{}）", sn, time, cpuUsageRate, memoryUsageRate,
                         version);
+                boolean flag = true;
+                for (Message m : queue) {
+                    if (m.getSn().equals(message.getSn())) {
+                        flag = false;
+                        queue.remove(m);
+                    }
+                }
+                if (flag) {
+                    SelfTerminal selfTerminal = selfTerminalMapper.querySelfTerminalBySn(sn);
+                    selfTerminal.setStatus(0);//在线
+                    int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
+                    if (result > 0) {
+                        log.info("终端({})修改状态成功", sn);
+                    } else {
+                        log.info("终端({})修改状态失败", sn);
+                    }
+                }
+                //将延时消息放到延时队列中
+                queue.offer(message);
+                messageConsumer.setQueue(queue);
+                e.execute(messageConsumer);
                 break;
             case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
                 break;
@@ -107,24 +155,33 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     }
                     memCachedClient.set(sn, map);
                 }
+                SelfTerminal selfTerminal2 = new SelfTerminal();
+                selfTerminal2.setSn(sn);
+                if (url != null && !url.equals("")) {
+                    selfTerminal2.setUrl(url);
+                }
+                if (ip != null && !sn.equals("")) {
+                    selfTerminal2.setIp(ip);
+                }
+                if (port != null) {
+                    selfTerminal2.setPort(port);
+                }
+                if (areaid != null && !areaid.equals("")) {
+                    selfTerminal2.setAreaid(areaid);
+                }
+                if (companyId != null) {
+                    selfTerminal2.setCompanyId(companyId);
+                }
+                int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal2);
+                if (result > 0) {
+                    log.info("终端({})参数设置成功", sn);
+                } else {
+                    log.info("终端({})参数设置失败", sn);
+                }
                 log.info("自助终端（{}）Web服务请求地址（{}）ip地址（{}）端口号（{}）", sn, url, ip, port);
                 break;
             default:
                 break;
-        }
-        SelfTerminal selfTerminal = new SelfTerminal();
-        selfTerminal.setSn(sn);
-        selfTerminal.setVersion(version);
-        selfTerminal.setUrl(url);
-        selfTerminal.setIp(ip);
-        selfTerminal.setPort(port);
-        selfTerminal.setAreaid(areaid);
-        selfTerminal.setCompanyId(companyId);
-        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
-        if (result > 0) {
-            log.info("终端({})参数设置成功", sn);
-        } else {
-            log.info("终端({})参数设置失败", sn);
         }
     }
 }

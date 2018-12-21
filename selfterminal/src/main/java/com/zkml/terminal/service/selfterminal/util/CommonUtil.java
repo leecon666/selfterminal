@@ -1,5 +1,7 @@
 package com.zkml.terminal.service.selfterminal.util;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * @Author: likun
  * @Date: Created in  2018/12/10 10:41
@@ -53,4 +55,12 @@ public class CommonUtil {
         return Long.toHexString(longVal);
     }
 
+    public static String parseHexString(String hexStr) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream(hexStr.length() / 2);
+        for (int i = 0; i < hexStr.length(); i += 2) {
+            os.write((hexString.indexOf(hexStr.charAt(i)) << 4 | hexString.indexOf(hexStr.charAt(i + 1))));
+        }
+        String result = new String(os.toByteArray());
+        return result;
+    }
 }

@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @Author: likun
@@ -27,13 +25,11 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue<>();
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 1000, 3000, TimeUnit
-                .MILLISECONDS, linkedBlockingQueue);
+        ExecutorService executorService=Executors.newSingleThreadExecutor();
         selfTerminalServiceThread.setCommand(msg.toString());
         selfTerminalServiceThread.setCtx(ctx);
         if (msg != null && !msg.toString().equals("")) {
-            threadPoolExecutor.execute(selfTerminalServiceThread);
+            executorService.execute(selfTerminalServiceThread);
         } else {
             log.error("接收的指令为空");
         }

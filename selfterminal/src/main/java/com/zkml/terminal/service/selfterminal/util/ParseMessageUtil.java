@@ -1,12 +1,16 @@
 package com.zkml.terminal.service.selfterminal.util;
 
 import com.zkml.terminal.service.selfterminal.model.Message;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,10 +39,10 @@ public class ParseMessageUtil {
                 Map<String, String> map = parseExtraInfo(extraInfo);
                 if (!CollectionUtils.isEmpty(map)) {
                     if (map.containsKey("01")) {
-                        message.setCpuUsageRate(Integer.parseInt(map.get("01"),16));
+                        message.setCpuUsageRate(Integer.parseInt(map.get("01"), 16));
                     }
                     if (map.containsKey("02")) {
-                        message.setMemoryUsageRate(Integer.parseInt(map.get("02"),16));
+                        message.setMemoryUsageRate(Integer.parseInt(map.get("02"), 16));
                     }
                 }
                 message.setTime(time);
@@ -69,19 +73,18 @@ public class ParseMessageUtil {
                     String description = messageBody.substring(4, 4 + 2 * paramlength);
                     switch (paramId) {
                         case 1:
-                            String areaCode = ASCIIUtil.convertHexStrToString(description);
-                            message.setAreaCode(areaCode);
+                            message.setAreaCode(description);
                             break;
                         case 2:
-                            Integer companyId = Integer.parseInt(description, 16);
+                            Integer companyId = Integer.parseInt(CommonUtil.parseHexString(description)) ;
                             message.setCompanyId(companyId);
                             break;
                         case 3:
-                            String url = ASCIIUtil.convertHexStrToString(description);
+                            String url = CommonUtil.parseHexString(description);
                             message.setUrl(url);
                             break;
                         case 4:
-                            String ip = ASCIIUtil.convertHexStrToString(description);
+                            String ip =CommonUtil.parseHexString(description);
                             message.setIp(ip);
                             break;
                         case 5:
@@ -89,7 +92,7 @@ public class ParseMessageUtil {
                             message.setPort(port);
                             break;
                         case 7:
-                            String areaid = ASCIIUtil.convertHexStrToString(description);
+                            String areaid = CommonUtil.parseHexString(description);
                             message.setAreaid(areaid);
                             break;
                         default:
@@ -176,10 +179,11 @@ public class ParseMessageUtil {
      * @param: sn终端号
      */
     public static void sendMessage(ChannelHandlerContext ctx, String msg, String sn) {
-        ChannelFuture future = ctx.channel().close();
+        ChannelFuture channelFuture = ctx.writeAndFlush(Unpooled.copiedBuffer(hexStringToBytes(msg)));
         //服务端发送数据完毕后,关闭通道
-        future.addListener(new ChannelFutureListener() {
-            public void operationComplete(ChannelFuture future) {
+        channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
+            @Override
+            public void operationComplete(Future<? super Void> future) throws Exception {
                 if (future.isSuccess()) {
                     log.info("终端号({})发送({})指令成功", sn, msg);
                 } else {
@@ -188,6 +192,7 @@ public class ParseMessageUtil {
             }
         });
     }
+
     /**
      * @Description:解析时间
      * @Method: com.zkml.terminal.service.selfterminal.util.ParseMessageUtil.parseTime
@@ -205,4 +210,24 @@ public class ParseMessageUtil {
         }
         return sb.toString();
     }
+
+    public static byte[] hexStringToBytes(String hexString) {
+        if (hexString == null || hexString.equals("")) {
+            return null;
+        }
+        hexString = hexString.toUpperCase();
+        int length = hexString.length() / 2;
+        char[] hexChars = hexString.toCharArray();
+        byte[] d = new byte[length];
+        for (int i = 0; i < length; i++) {
+            int pos = i * 2;
+            d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+        }
+        return d;
+    }
+
+    public static byte charToByte(char c) {
+        return (byte) "0123456789ABCDEF".indexOf(c);
+    }
+
 }

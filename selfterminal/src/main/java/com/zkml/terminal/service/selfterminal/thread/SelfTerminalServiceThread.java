@@ -38,11 +38,12 @@ public class SelfTerminalServiceThread implements Runnable {
         log.info("接收终端发来的指令({})", this.command);
         if (command != null && !command.equals("")) {
             command = command.substring(4);
-            Message message = new Message(command);
+            Message message = new Message(command,10); // 添加延时消息,延时10分钟
             String sn = message.getSn();
             if (sn != null && !sn.equals("")) {
                 Map<String, String> resultMap = selfTerminalService.querySelfTerminalBySn(sn);
                 if (resultMap != null && !resultMap.isEmpty()) {
+                    log.info(message.getMessageId());
                     switch (message.getMessageId()) {
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                             String key = "command" + sn;
