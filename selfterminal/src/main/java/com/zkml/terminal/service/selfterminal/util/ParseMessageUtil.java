@@ -3,14 +3,12 @@ package com.zkml.terminal.service.selfterminal.util;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,17 +51,28 @@ public class ParseMessageUtil {
                 String messageName = getMessageNameByMsgId(messageId);
                 Integer result = Integer.parseInt(messageBody.substring(4, 6), 16);
                 StringBuilder sb = new StringBuilder("");
-                sb.append("终端号为").append(message.getSn()).append(",").append(messageName);
-                if (result == 0) {
-                    sb.append("成功");
-                } else if (result == 1) {
-                    sb.append("失败");
-                } else if (result == 2) {
-                    sb.append("消息有误");
-                } else if (result == 3) {
-                    sb.append("不支持");
+                String sn = message.getSn();
+                sb.append("终端号为").append(sn).append(",").append(messageName);
+                switch (result) {
+                    case 0:
+                        sb.append("成功");
+                        break;
+                    case 1:
+                        sb.append("失败");
+                        break;
+                    case 2:
+                        sb.append("消息有误");
+                        break;
+                    case 3:
+                        sb.append("不支持");
+                        break;
+                    default:
+                        break;
                 }
                 log.info(sb.toString());
+                if (messageId.equals("8103") && result == 0) {
+                    message.setSettingFlag(true);//终端回复参数设置成功，需要修改数据库
+                }
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS://查询终端参数应答
                 messageBody = messageBody.substring(2);
@@ -76,7 +85,7 @@ public class ParseMessageUtil {
                             message.setAreaCode(description);
                             break;
                         case 2:
-                            Integer companyId = Integer.parseInt(CommonUtil.parseHexString(description)) ;
+                            Integer companyId = Integer.parseInt(CommonUtil.parseHexString(description));
                             message.setCompanyId(companyId);
                             break;
                         case 3:
@@ -84,7 +93,7 @@ public class ParseMessageUtil {
                             message.setUrl(url);
                             break;
                         case 4:
-                            String ip =CommonUtil.parseHexString(description);
+                            String ip = CommonUtil.parseHexString(description);
                             message.setIp(ip);
                             break;
                         case 5:

@@ -140,21 +140,51 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 e.execute(messageConsumer);
                 break;
             case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
+                if (message.isSettingFlag()) {//终端回复终端参数设置成功,修改数据库
+                    String key = "setting" + sn;
+                    Object o = memCachedClient.get(key);
+                    if (o != null) {
+                        Map<String, String> map = (Map<String, String>)o;
+                        SelfTerminal selfTerminal = new SelfTerminal();
+                        selfTerminal.setSn(sn);
+                        if (map.get("url") != null && !map.get("url").equals("")) {
+                            selfTerminal.setUrl(map.get("url"));
+                        }
+                        if (map.get("ip") != null && !map.get("ip").equals("")) {
+                            selfTerminal.setIp(map.get("ip"));
+                        }
+                        if (map.get("port") != null && !map.get("port").equals("")) {
+                            selfTerminal.setPort(Integer.parseInt(map.get("port")));
+                        }
+                        if (map.get("areaid") != null && !map.get("areaid").equals("")) {
+                            selfTerminal.setAreaid(map.get("areaid"));
+                        }
+                        if (map.get("companyId") != null && !map.get("companyId").equals("")) {
+                            selfTerminal.setCompanyId(Integer.parseInt(map.get("companyId")));
+                        }
+                        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
+                        if (result > 0) {
+                            log.info("终端({})参数设置成功", sn);
+                        } else {
+                            log.info("终端({})参数设置失败", sn);
+                        }
+                    }
+                }
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
-                if (obj != null) {
-                    Map<String, String> map = (Map<String, String>) obj;
-                    if (url != null && !url.equals("")) {
-                        map.put("url", url);
-                    }
-                    if (ip != null && !ip.equals("")) {
-                        map.put("ip", ip);
-                    }
-                    if (port != null) {
-                        map.put("port", port.toString());
-                    }
-                    memCachedClient.set(sn, map);
-                }
+//                if (obj != null) {
+//                    Map<String, String> map = (Map<String, String>) obj;
+//                    if (url != null && !url.equals("")) {
+//                        map.put("url", url);
+//                    }
+//                    if (ip != null && !ip.equals("")) {
+//                        map.put("ip", ip);
+//                    }
+//                    if (port != null) {
+//                        map.put("port", port.toString());
+//                    }
+//                    memCachedClient.set(sn, map);
+//                }
                 SelfTerminal selfTerminal2 = new SelfTerminal();
                 selfTerminal2.setSn(sn);
                 if (url != null && !url.equals("")) {

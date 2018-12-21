@@ -24,18 +24,15 @@ public class Message implements Delayed {
     private String ip; // TCP服务的IP
     private Integer port; // TCP服务的端口号
     private String areaid;// 区域ID
-
     private String areaCode;// 区域区号
     private String messageId;// 消息ID
     private Integer messageBodyLength;// 消息体的长度
     private String checkCode;// 检验码
     private String messageBody;//消息体
-  //  private int excuteTime;// 延迟时长，这个是必须的属性因为要按照这个判断延时时长
-    private long activeTime;//
+    private long activeTime;// 延迟时长，这个是必须的属性因为要按照这个判断延时时长
+    private boolean settingFlag = false;//默认为false，用于判断终端参数是否设置成功
 
-
-
-    public Message(String command,long activeTime) {
+    public Message(String command, long activeTime) {
         this.messageId = command.substring(0, 4);
         this.messageBodyLength = Integer.parseInt(command.substring(4, 8), 16);
         this.sn = ASCIIUtil.convertHexASCToStr(command.substring(8, 32));
@@ -62,6 +59,6 @@ public class Message implements Delayed {
     @Override
     public int compareTo(Delayed delayed) {
         long diff = getDelay(TimeUnit.NANOSECONDS) - delayed.getDelay(TimeUnit.NANOSECONDS);
-        return diff > 0 ? 1 :-1;
+        return diff > 0 ? 1 : -1;
     }
 }
