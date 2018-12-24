@@ -30,8 +30,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
     @Qualifier("messageConsumer")
     private MessageConsumer messageConsumer;
     // 创建延时队列
-    DelayQueue<Message> queue = new DelayQueue<Message>();
-    ExecutorService e = Executors.newFixedThreadPool(1);
+    DelayQueue<Message> queue = new DelayQueue<>();
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     /**
      * @Description:根据终端号查询终端参数
@@ -125,7 +125,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     }
                 }
                 if (flag) {
-                    SelfTerminal selfTerminal = selfTerminalMapper.querySelfTerminalBySn(sn);
+                    SelfTerminal selfTerminal = new SelfTerminal();
+                    selfTerminal.setSn(sn);
                     selfTerminal.setStatus(0);//在线
                     int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
                     if (result > 0) {
@@ -137,39 +138,9 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 //将延时消息放到延时队列中
                 queue.offer(message);
                 messageConsumer.setQueue(queue);
-                e.execute(messageConsumer);
+                executorService.execute(messageConsumer);
                 break;
             case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
-                if (message.isSettingFlag()) {//终端回复终端参数设置成功,修改数据库
-                    String key = "setting" + sn;
-                    Object o = memCachedClient.get(key);
-                    if (o != null) {
-                        Map<String, String> map = (Map<String, String>)o;
-                        SelfTerminal selfTerminal = new SelfTerminal();
-                        selfTerminal.setSn(sn);
-                        if (map.get("url") != null && !map.get("url").equals("")) {
-                            selfTerminal.setUrl(map.get("url"));
-                        }
-                        if (map.get("ip") != null && !map.get("ip").equals("")) {
-                            selfTerminal.setIp(map.get("ip"));
-                        }
-                        if (map.get("port") != null && !map.get("port").equals("")) {
-                            selfTerminal.setPort(Integer.parseInt(map.get("port")));
-                        }
-                        if (map.get("areaid") != null && !map.get("areaid").equals("")) {
-                            selfTerminal.setAreaid(map.get("areaid"));
-                        }
-                        if (map.get("companyId") != null && !map.get("companyId").equals("")) {
-                            selfTerminal.setCompanyId(Integer.parseInt(map.get("companyId")));
-                        }
-                        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
-                        if (result > 0) {
-                            log.info("终端({})参数设置成功", sn);
-                        } else {
-                            log.info("终端({})参数设置失败", sn);
-                        }
-                    }
-                }
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
 //                if (obj != null) {

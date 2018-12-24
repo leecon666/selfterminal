@@ -47,7 +47,6 @@ public class SelfTerminalServiceThread implements Runnable {
                     switch (message.getMessageId()) {
                         case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
                             ParseMessageUtil.parseMessage(message);
-                            selfTerminalService.settingTerminalParams(message);
                             break;
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                             String key = "command" + sn;

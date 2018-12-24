@@ -30,7 +30,6 @@ public class Message implements Delayed {
     private String checkCode;// 检验码
     private String messageBody;//消息体
     private long activeTime;// 延迟时长，这个是必须的属性因为要按照这个判断延时时长
-    private boolean settingFlag = false;//默认为false，用于判断终端参数是否设置成功
 
     public Message(String command, long activeTime) {
         this.messageId = command.substring(0, 4);

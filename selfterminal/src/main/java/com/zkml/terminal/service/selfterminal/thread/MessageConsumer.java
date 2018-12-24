@@ -31,10 +31,9 @@ public class MessageConsumer implements Runnable {
         while (!Thread.interrupted()) {
             try {
                 Message msg = queue.take();
-                System.out.println(System.currentTimeMillis());
                 if (msg != null) {
-                    SelfTerminal selfTerminal = selfTerminalMapper
-                            .querySelfTerminalBySn(msg.getSn());
+                    SelfTerminal selfTerminal = new SelfTerminal();
+                    selfTerminal.setSn(msg.getSn());
                     selfTerminal.setStatus(1);//离线
                     int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
                     if (result > 0) {

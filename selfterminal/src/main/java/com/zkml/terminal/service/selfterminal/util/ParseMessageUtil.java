@@ -70,9 +70,6 @@ public class ParseMessageUtil {
                         break;
                 }
                 log.info(sb.toString());
-                if (messageId.equals("8103") && result == 0) {
-                    message.setSettingFlag(true);//终端回复参数设置成功，需要修改数据库
-                }
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS://查询终端参数应答
                 messageBody = messageBody.substring(2);
