@@ -47,6 +47,7 @@ public class ParseMessageUtil {
                 message.setVersion(version);
                 break;
             case MessageIdUtil.GENERAL_RESPONSE:// 终端通用应答
+                log.info("<<<<<<<<<<终端通用应答");
                 String messageId = messageBody.substring(0, 4);
                 String messageName = getMessageNameByMsgId(messageId);
                 Integer result = Integer.parseInt(messageBody.substring(4, 6), 16);
@@ -186,7 +187,6 @@ public class ParseMessageUtil {
      */
     public static void sendMessage(ChannelHandlerContext ctx, String msg, String sn) {
         ChannelFuture channelFuture = ctx.writeAndFlush(Unpooled.copiedBuffer(hexStringToBytes(msg)));
-        //服务端发送数据完毕后,关闭通道
         channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {

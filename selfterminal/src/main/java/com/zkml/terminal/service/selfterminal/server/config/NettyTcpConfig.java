@@ -2,6 +2,7 @@ package com.zkml.terminal.service.selfterminal.server.config;
 
 import com.zkml.terminal.service.selfterminal.server.entity.NettyConfig;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -63,11 +64,17 @@ public class NettyTcpConfig {
     public Map<ChannelOption<?>, Object> tcpChannelOptions() {
         Map<ChannelOption<?>, Object> options = new HashMap<>();
         // 保持连接
-        options.put(ChannelOption.SO_KEEPALIVE, true);
+        options.put(ChannelOption.SO_KEEPALIVE, nettyConfig.isKeepAlive());
         // 保持连接数
         options.put(ChannelOption.SO_BACKLOG, nettyConfig.getBackLog());
         // 有数据立即发送
-        options.put(ChannelOption.TCP_NODELAY, true);
+        options.put(ChannelOption.TCP_NODELAY, nettyConfig.isNodelay());
+        //地址复用
+        options.put(ChannelOption.SO_REUSEADDR,nettyConfig.isReuseAddr());
+        //TCP数据发送缓冲区大小
+        options.put(ChannelOption.SO_SNDBUF,nettyConfig.getSndBuf());
+        //TCP数据接收缓冲区大小
+        options.put(ChannelOption.SO_RCVBUF,nettyConfig.getRevBuf());
         return options;
     }
 }

@@ -82,7 +82,7 @@ public class SelfTerminalServiceThread implements Runnable {
                     log.error("未查到({})终端的配置信息", sn);
                 }
             } else {
-                log.error("从接收的指令中未获取到终端号");
+                log.error("从接收的指令中未得到终端号");
             }
         }
     }

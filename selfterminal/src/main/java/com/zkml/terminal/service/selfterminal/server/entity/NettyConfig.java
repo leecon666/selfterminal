@@ -37,4 +37,16 @@ public class NettyConfig {
      * 有数据立即发送
      */
     private boolean nodelay;
+    /**
+     * 地址复用
+     */
+    private boolean reuseAddr;
+    /**
+     * TCP数据发送缓冲区大小
+     */
+    private Integer sndBuf;
+    /**
+     * TCP数据接收缓冲区大小
+     */
+    private Integer revBuf ;
 }

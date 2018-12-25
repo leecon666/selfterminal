@@ -57,7 +57,9 @@ netty:
   keepalive: true #保持连接
   backlog: 1024 #保持连接数
   nodelay: true #有数据立即发送
-
+  reuseaddr: true #地址复用，默认值False
+  sndBuf: 10485760 # Socket参数，TCP数据发送缓冲区大小
+  revBuf: 10485760 # Socket参数，TCP数据接收缓冲区大小
   #memcached缓存配置
 memcached:
   servers: 36.7.87.75:11211  #服务器列表
