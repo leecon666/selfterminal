@@ -140,22 +140,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 messageConsumer.setQueue(queue);
                 executorService.execute(messageConsumer);
                 break;
-            case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
-                break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
-//                if (obj != null) {
-//                    Map<String, String> map = (Map<String, String>) obj;
-//                    if (url != null && !url.equals("")) {
-//                        map.put("url", url);
-//                    }
-//                    if (ip != null && !ip.equals("")) {
-//                        map.put("ip", ip);
-//                    }
-//                    if (port != null) {
-//                        map.put("port", port.toString());
-//                    }
-//                    memCachedClient.set(sn, map);
-//                }
                 SelfTerminal selfTerminal2 = new SelfTerminal();
                 selfTerminal2.setSn(sn);
                 if (url != null && !url.equals("")) {
@@ -168,7 +153,11 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     selfTerminal2.setPort(port);
                 }
                 if (areaid != null && !areaid.equals("")) {
-                    selfTerminal2.setAreaid(areaid);
+                    if (areaid.indexOf("ppp") != -1 || areaid.indexOf("ccc") != -1) {
+                        selfTerminal2.setAreaid(areaid.substring(0, areaid.length() - 3));
+                    } else {
+                        selfTerminal2.setAreaid(areaid);
+                    }
                 }
                 if (companyId != null) {
                     selfTerminal2.setCompanyId(companyId);
@@ -179,7 +168,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 } else {
                     log.info("终端({})参数设置失败", sn);
                 }
-                log.info("自助终端（{}）Web服务请求地址（{}）ip地址（{}）端口号（{}）", sn, url, ip, port);
+                log.info("自助终端（{}）Web服务请求地址（{}）ip地址（{}）端口号（{}）单位编号({})区域ID({})", sn, url, ip, port, companyId, areaid);
                 break;
             default:
                 break;
