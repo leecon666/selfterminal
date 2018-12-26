@@ -47,7 +47,6 @@ public class ParseMessageUtil {
                 message.setVersion(version);
                 break;
             case MessageIdUtil.GENERAL_RESPONSE:// 终端通用应答
-                log.info("<<<<<<<<<<终端通用应答");
                 String messageId = messageBody.substring(0, 4);
                 String messageName = getMessageNameByMsgId(messageId);
                 Integer result = Integer.parseInt(messageBody.substring(4, 6), 16);
