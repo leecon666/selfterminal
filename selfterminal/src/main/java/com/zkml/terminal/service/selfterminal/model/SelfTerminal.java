@@ -28,7 +28,7 @@ public class SelfTerminal {
      */
     private String version;
     /**
-     * 状态(离线,在线)
+     * 状态(1:离线,0:在线)
      */
     private Integer status;
     /**
@@ -86,5 +86,13 @@ public class SelfTerminal {
     /**
      * 单位ID
      */
-    private Integer companyId;
+    private String companyId;
+    /**
+     * 库标识
+     */
+    private String psign;
+    /**
+     * 单位名称
+     */
+    private String companyName;
 }

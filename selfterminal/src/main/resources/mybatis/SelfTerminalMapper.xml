@@ -18,42 +18,31 @@
         <result column="url" jdbcType="VARCHAR" property="url"/>
         <result column="check_sn" jdbcType="VARCHAR" property="checkSn"/>
         <result column="logic_delete" jdbcType="INTEGER" property="logicDelete"/>
-        <result column="company_id" jdbcType="INTEGER" property="companyId"/>
+        <result column="company_id" jdbcType="VARCHAR" property="companyId"/>
         <result column="time" jdbcType="VARCHAR" property="time"/>
+        <result column="psign" jdbcType="VARCHAR" property="psign"/>
     </resultMap>
     <!--根据终端号查询自助终端-->
     <select id="querySelfTerminalBySn" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-          id, sn, type, version, status, create_time,update_time, cpu_usage_rate, memory_usage_rate, areaid,
-          ip, port, url, check_sn, logic_delete,company_id,time
-        from self_terminal_new
+          id, sn, type, version, status , areaid,
+          ip, port, url, check_sn, logic_delete,company_id
+        from self_terminal
         where sn = #{sn,jdbcType=VARCHAR} and logic_delete=0
     </select>
     <!--终端参数设置-->
     <update id="updateByPrimaryKeySelective"
             parameterType="com.zkml.terminal.service.selfterminal.model.SelfTerminal">
-        update self_terminal_new
+        update self_terminal
         <set>
-            <if test="type != null">
-                type = #{type,jdbcType=VARCHAR},
-            </if>
             <if test="version != null">
                 version = #{version,jdbcType=VARCHAR},
             </if>
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
             <if test="updateTime != null">
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="cpuUsageRate != null">
-                cpu_usage_rate = #{cpuUsageRate,jdbcType=VARCHAR},
-            </if>
-            <if test="memoryUsageRate != null">
-                memory_usage_rate = #{memoryUsageRate,jdbcType=VARCHAR},
             </if>
             <if test="areaid != null">
                 areaid = #{areaid,jdbcType=VARCHAR},
@@ -67,17 +56,11 @@
             <if test="url != null">
                 url = #{url,jdbcType=VARCHAR},
             </if>
-            <if test="checkSn != null">
-                check_sn = #{checkSn,jdbcType=VARCHAR},
-            </if>
-            <if test="logicDelete != null">
-                logic_delete = #{logicDelete,jdbcType=INTEGER},
-            </if>
             <if test="companyId != null">
-                company_id = #{companyId,jdbcType=INTEGER},
+                company_id = #{companyId,jdbcType=VARCHAR},
             </if>
-            <if test="time != null">
-                time = #{time,jdbcType=VARCHAR},
+            <if test="psign != null">
+                psign = #{psign,jdbcType=VARCHAR},
             </if>
         </set>
         where sn = #{sn,jdbcType=VARCHAR} and logic_delete=0

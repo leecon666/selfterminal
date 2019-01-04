@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.DelayQueue;
@@ -53,9 +54,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         map.put("ip", selfTerminal.getIp());
         map.put("port", selfTerminal.getPort().toString());
         map.put("url", selfTerminal.getUrl());
-        map.put("cpuUsageRate", "");
-        map.put("memoryUsageRate", "");
-        map.put("time", "");
+        map.put("companyId", selfTerminal.getCompanyId());
+        map.put("type", selfTerminal.getType());
         memCachedClient.add(sn, map);
         return map;
     }
@@ -79,7 +79,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
         String ip = CommonUtil.formatStr(message.getIp());
         Integer port = message.getPort();
         String areaid = CommonUtil.formatStr(message.getAreaid());
-        Integer companyId = message.getCompanyId();
+        String companyId = message.getCompanyId();
         Object obj = memCachedClient.get(sn);
         switch (messageId) {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
@@ -107,6 +107,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                         SelfTerminal selfTerminal1 = new SelfTerminal();
                         selfTerminal1.setSn(sn);
                         selfTerminal1.setVersion(versionStr);
+                        selfTerminal1.setUpdateTime(new Date());
                         int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
                         if (result > 0) {
                             log.info("终端({})版本设置成功", sn);
@@ -128,6 +129,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     SelfTerminal selfTerminal = new SelfTerminal();
                     selfTerminal.setSn(sn);
                     selfTerminal.setStatus(0);//在线
+                    selfTerminal.setUpdateTime(new Date());
                     int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
                     if (result > 0) {
                         log.info("终端({})修改状态成功", sn);
@@ -154,21 +156,44 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 }
                 if (areaid != null && !areaid.equals("")) {
                     if (areaid.indexOf("ppp") != -1 || areaid.indexOf("ccc") != -1) {
-                        selfTerminal2.setAreaid(areaid.substring(0, areaid.length() - 3));
-                    } else {
-                        selfTerminal2.setAreaid(areaid);
+                        areaid = areaid.substring(0, areaid.length() - 3);
                     }
+                    selfTerminal2.setAreaid(areaid);
                 }
-                if (companyId != null) {
+                if (companyId != null && !companyId.equals("")) {
                     selfTerminal2.setCompanyId(companyId);
                 }
+                selfTerminal2.setUpdateTime(new Date());
                 int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal2);
                 if (result > 0) {
-                    log.info("终端({})参数设置成功", sn);
+                    log.info("终端({})修改成功", sn);
                 } else {
-                    log.info("终端({})参数设置失败", sn);
+                    log.info("终端({})修改失败", sn);
                 }
                 log.info("自助终端（{}）Web服务请求地址（{}）ip地址（{}）端口号（{}）单位编号({})区域ID({})", sn, url, ip, port, companyId, areaid);
+                break;
+            case MessageIdUtil.GENERAL_RESPONSE:// 终端通用应答
+                if (message.isFlag()) {
+                    String settingKey = "setting" + sn;
+                    if (memCachedClient.keyExists(settingKey)) {
+                        Object o = memCachedClient.get(settingKey);
+                        Map<String, String> map = (Map<String, String>) o;
+                        String psign = map.get("psign");
+                        SelfTerminal selfTerminal3 = new SelfTerminal();
+                        selfTerminal3.setSn(sn);
+                        if (psign != null && !psign.equals("")) {
+                            selfTerminal3.setPsign(psign);
+                        }
+                        selfTerminal3.setUpdateTime(new Date());
+                        int column = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal3);
+                        if (column > 0) {
+                            log.info("终端({})修改库标识成功", sn);
+                        } else {
+                            log.info("终端({})修改库标识失败", sn);
+                        }
+                    }
+
+                }
                 break;
             default:
                 break;

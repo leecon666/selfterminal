@@ -2,7 +2,9 @@ package com.zkml.terminal.service.selfterminal.thread;
 
 import com.alibaba.druid.support.json.JSONUtils;
 import com.whalin.MemCached.MemCachedClient;
+import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
 import com.zkml.terminal.service.selfterminal.model.Message;
+import com.zkml.terminal.service.selfterminal.model.SelfTerminal;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
 import com.zkml.terminal.service.selfterminal.util.ParseMessageUtil;
@@ -30,6 +32,8 @@ public class SelfTerminalServiceThread implements Runnable {
     private ISelfTerminalService selfTerminalService;
     @Autowired
     private MemCachedClient memCachedClient;
+    @Autowired
+    private SelfTerminalMapper selfTerminalMapper;
     private String command;
     private ChannelHandlerContext ctx;
 
@@ -47,6 +51,7 @@ public class SelfTerminalServiceThread implements Runnable {
                     switch (message.getMessageId()) {
                         case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
                             ParseMessageUtil.parseMessage(message);
+                            selfTerminalService.settingTerminalParams(message);
                             break;
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
                             String key = "command" + sn;

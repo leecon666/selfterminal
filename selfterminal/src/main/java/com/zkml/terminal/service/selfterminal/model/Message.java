@@ -19,7 +19,7 @@ public class Message implements Delayed {
     private String time;// 上传时间
     private Integer cpuUsageRate; // CPU占用率
     private Integer memoryUsageRate; // 内存用量
-    private Integer companyId;// 单位ID
+    private String companyId;// 单位ID
     private String url;// Web服务请求地址
     private String ip; // TCP服务的IP
     private Integer port; // TCP服务的端口号
@@ -29,6 +29,7 @@ public class Message implements Delayed {
     private Integer messageBodyLength;// 消息体的长度
     private String checkCode;// 检验码
     private String messageBody;//消息体
+    private boolean flag=false;
     private long activeTime;// 延迟时长，这个是必须的属性因为要按照这个判断延时时长
 
     public Message(String command, long activeTime) {

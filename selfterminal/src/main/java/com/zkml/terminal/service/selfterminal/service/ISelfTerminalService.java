@@ -14,13 +14,12 @@ public interface ISelfTerminalService {
      * @param: sn终端号
      */
     Map<String,String> querySelfTerminalBySn(String sn);
-
     /**
      * @Description:终端参数设置
      * @Method: com.zkml.terminal.service.selfterminal.service.ISelfTerminalService.settingTerminalParams
      * @Author: likun
      * @Date: 2018/12/11 10:58
-     * @param: parseMessageUtil
+     * @param: message
      */
     void settingTerminalParams(Message message);
 }

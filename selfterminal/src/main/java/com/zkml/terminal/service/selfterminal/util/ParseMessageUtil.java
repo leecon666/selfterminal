@@ -69,6 +69,9 @@ public class ParseMessageUtil {
                     default:
                         break;
                 }
+                if(messageId.equals(MessageIdUtil.SETTING_PARAMETERS)&&result==0){
+                    message.setFlag(true);
+                }
                 log.info(sb.toString());
                 break;
             case MessageIdUtil.REPLY_QUERY_PARAMETERS://查询终端参数应答
@@ -82,7 +85,7 @@ public class ParseMessageUtil {
                             message.setAreaCode(description);
                             break;
                         case 2:
-                            Integer companyId = Integer.parseInt(CommonUtil.parseHexString(description));
+                            String companyId = CommonUtil.parseHexString(description);
                             message.setCompanyId(companyId);
                             break;
                         case 3:
