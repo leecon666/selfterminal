@@ -7,7 +7,7 @@ zkml:
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://36.7.87.75:3308/vbox-maintenance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
     username: root
     password: 123456
@@ -37,8 +37,6 @@ spring:
 
 # MyBatis
 mybatis:
-    # 搜索指定包别名
-    typeAliasesPackage: com.zkml.terminal.thread.selfterminal
     # 配置mapper的扫描，找到所有的mapper.xml映射文件
     mapperLocations: classpath:mybatis/*Mapper.xml
 
@@ -70,3 +68,13 @@ memcached:
   maintSleep: 3000  #连接池守护线程的睡眠时间
   nagle: false  #TCP参数
   socketTo: 3000  #连接超时
+
+#Dubbo 服务配置
+dubbo:
+  application:
+    name: selfterminal
+  registry:
+    address: zookeeper://192.168.15.209:2181
+  protocol:
+    name: dubbo
+    port: 20880

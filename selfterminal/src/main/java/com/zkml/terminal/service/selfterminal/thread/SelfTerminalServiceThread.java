@@ -1,13 +1,12 @@
 package com.zkml.terminal.service.selfterminal.thread;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.whalin.MemCached.MemCachedClient;
 import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
 import com.zkml.terminal.service.selfterminal.model.Message;
-import com.zkml.terminal.service.selfterminal.model.SelfTerminal;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
 import com.zkml.terminal.service.selfterminal.util.ParseMessageUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author: likun
@@ -36,7 +36,7 @@ public class SelfTerminalServiceThread implements Runnable {
     private SelfTerminalMapper selfTerminalMapper;
     private String command;
     private ChannelHandlerContext ctx;
-
+    public static Map<String, Channel> map = new ConcurrentHashMap<>();//解决多线程冲突
     @Override
     public void run() {
         log.info("接收终端发来的指令({})", this.command);
@@ -47,30 +47,13 @@ public class SelfTerminalServiceThread implements Runnable {
             if (sn != null && !sn.equals("")) {
                 Map<String, String> resultMap = selfTerminalService.querySelfTerminalBySn(sn);
                 if (resultMap != null && !resultMap.isEmpty()) {
-                    log.info(message.getMessageId());
+                    map.put(sn,ctx.channel());
                     switch (message.getMessageId()) {
                         case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
                             ParseMessageUtil.parseMessage(message);
                             selfTerminalService.settingTerminalParams(message);
                             break;
                         case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
-                            String key = "command" + sn;
-                            if (memCachedClient != null && memCachedClient.keyExists(key)) {
-                                Object msg = memCachedClient.get(key);
-                                if (msg != null) {
-                                    log.info("指令：" + JSONUtils.toJSONString(msg));
-                                    String msgStr = msg.toString();
-                                    if (msgStr.indexOf("|") != -1) {
-                                        String[] msgArray = msgStr.split("\\|");
-                                        for (int i = 0; i < msgArray.length; i++) {
-                                            ParseMessageUtil.sendMessage(ctx, msgArray[i], sn);
-                                        }
-                                    } else {
-                                        ParseMessageUtil.sendMessage(ctx, msgStr, sn);
-                                    }
-                                }
-                                memCachedClient.delete(key);
-                            }
                             log.info("终端({})定时上报", sn);
                             ParseMessageUtil.parseMessage(message);
                             selfTerminalService.settingTerminalParams(message);

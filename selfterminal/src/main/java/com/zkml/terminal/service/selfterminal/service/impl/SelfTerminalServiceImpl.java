@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
      * @Date: 2018/12/11 11:58
      * @param: message
      */
+    @Transactional
     @Override
     public void settingTerminalParams(Message message) {
         String sn = CommonUtil.formatStr(message.getSn());

@@ -41,6 +41,7 @@ public class MessageConsumer implements Runnable {
                     } else {
                         log.info("终端({})修改状态失败", msg.getSn());
                     }
+                    SelfTerminalServiceThread.map.remove(msg.getSn());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

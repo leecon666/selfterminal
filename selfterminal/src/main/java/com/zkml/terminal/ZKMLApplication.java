@@ -1,5 +1,6 @@
-package com.zkml.terminal.service.selfterminal;
+package com.zkml.terminal;
 
+import com.alibaba.dubbo.config.spring.context.annotation.EnableDubbo;
 import com.zkml.terminal.service.selfterminal.server.nettyserver.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
@@ -14,6 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 @MapperScan("com.zkml.terminal.service.selfterminal.dao")
+@EnableDubbo
 @Slf4j
 public class ZKMLApplication {
     public static void main(String[] args) {

@@ -2,6 +2,7 @@ package com.zkml.terminal.service.selfterminal.util;
 
 import com.zkml.terminal.service.selfterminal.model.Message;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.Future;
@@ -187,7 +188,7 @@ public class ParseMessageUtil {
      * @param: msg消息
      * @param: sn终端号
      */
-    public static void sendMessage(ChannelHandlerContext ctx, String msg, String sn) {
+    public static void sendMessage(Channel ctx, String msg, String sn) {
         ChannelFuture channelFuture = ctx.writeAndFlush(Unpooled.copiedBuffer(hexStringToBytes(msg)));
         channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override
