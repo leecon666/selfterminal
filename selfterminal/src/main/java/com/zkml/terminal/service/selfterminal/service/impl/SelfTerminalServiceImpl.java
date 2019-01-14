@@ -54,7 +54,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             map.put("areaid", selfTerminal.getAreaid());
             map.put("version", selfTerminal.getVersion());
             map.put("ip", selfTerminal.getIp());
-            map.put("port", selfTerminal.getPort().toString());
+            map.put("port", selfTerminal.getPort()+"");
             map.put("url", selfTerminal.getUrl());
             map.put("companyId", selfTerminal.getCompanyId());
             map.put("type", selfTerminal.getType());
