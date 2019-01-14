@@ -46,6 +46,7 @@ logging:
     com.ruoyi: debug
     org.springframework: WARN
     org.spring.springboot.dao: debug
+    com.zkml.terminal.service.selfterminal.dao: debug
 
 #netty配置
 netty:
