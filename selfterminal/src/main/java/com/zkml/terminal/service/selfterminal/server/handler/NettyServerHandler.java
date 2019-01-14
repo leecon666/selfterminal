@@ -22,10 +22,10 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
     @Autowired
     @Qualifier("selfTerminalServiceThread")
     private SelfTerminalServiceThread selfTerminalServiceThread;
+    ExecutorService executorService=Executors.newSingleThreadExecutor();
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ExecutorService executorService=Executors.newSingleThreadExecutor();
         selfTerminalServiceThread.setCommand(msg.toString());
         selfTerminalServiceThread.setCtx(ctx);
         if (msg != null && !msg.toString().equals("")) {
