@@ -22,8 +22,7 @@ public class NettyServerHandler extends ChannelHandlerAdapter {
     @Autowired
     @Qualifier("selfTerminalServiceThread")
     private SelfTerminalServiceThread selfTerminalServiceThread;
-    ExecutorService executorService=Executors.newSingleThreadExecutor();
-
+    ExecutorService executorService=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1);
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         selfTerminalServiceThread.setCommand(msg.toString());
