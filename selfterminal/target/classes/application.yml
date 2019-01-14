@@ -1,7 +1,44 @@
 #项目名称、版权年份
 zkml:
-  name:ZKML
-  copyrightYear:2018
+ name: ZKML
+ copyrightYear: 2018
+
+#druid配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://36.7.87.75:3308/vbox-maintenance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
+    username: root
+    password: 123456
+    # 初始化大小，最小，最大
+    initialSize: 1
+    minIdle: 3
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnReturn: false
+    testOnBorrow: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,slf4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    #useGlobalDataSourceStat: true
+
+# MyBatis
+mybatis:
+    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+    mapperLocations: classpath:mybatis/*Mapper.xml
 
 #日志配置
 logging:
@@ -10,21 +47,34 @@ logging:
     org.springframework: WARN
     org.spring.springboot.dao: debug
 
-  #netty配置
-  netty:
-    tcpport:31292  #tcp协议端口
-    bossThread:1
-    workerThread:2
-    keepalive:true
-    backlog:1024
-
+#netty配置
+netty:
+  tcpport: 31292 #tcp协议端口
+  bossThread: 1
+  workerThread: 2
+  keepalive: true #保持连接
+  backlog: 1024 #保持连接数
+  nodelay: true #有数据立即发送
+  reuseaddr: true #地址复用，默认值False
+  sndBuf: 10485760 # Socket参数，TCP数据发送缓冲区大小
+  revBuf: 10485760 # Socket参数，TCP数据接收缓冲区大小
   #memcached缓存配置
-  memcached:
-    servers: 36.7.87.75:11211  #服务器列表
-    weight: 5  #权重
-    initConn: 20  #初始化连接数
-    minConn: 10  #最小连接数
-    maxConn: 50  #最大连接数
-    maintSleep: 3000  #连接池守护线程的睡眠时间
-    nagle: false  #TCP参数
-    socketTo: 3000  #连接超时
+memcached:
+  servers: 36.7.87.75:11211  #服务器列表
+  weight: 5  #权重
+  initConn: 20  #初始化连接数
+  minConn: 10  #最小连接数
+  maxConn: 50  #最大连接数
+  maintSleep: 3000  #连接池守护线程的睡眠时间
+  nagle: false  #TCP参数
+  socketTo: 3000  #连接超时
+
+#Dubbo 服务配置
+dubbo:
+  application:
+    name: selfterminal
+  registry:
+    address: zookeeper://192.168.15.209:2181
+  protocol:
+    name: dubbo
+    port: 20880
