@@ -1,5 +1,6 @@
 package com.zkml.terminal.service.selfterminal.server.handler;
 
+import com.zkml.terminal.service.selfterminal.util.ASCIIUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -29,7 +30,14 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     String messageBody = result.substring(36, result.length() - 2);
                     int messageBodyLength = messageBody.length();
                     if (messageBodyLength == bodyLength * 2) {
-                        list.add(result);
+                        String checkCode = result.substring(result.length() - 2, result.length());
+                        String calculatedCheckSum = ASCIIUtil.checkingCode(result.substring(4, result.length() - 2));
+                        if (checkCode.equals(calculatedCheckSum)) {//验证校验码
+                            list.add(result);
+                        } else {
+                            log.error("消息（{}）校验有问题", result);
+                            byteBuf.resetReaderIndex();
+                        }
                     } else {
                         log.error("此消息（{}）出现拆包问题", result);
                         byteBuf.resetReaderIndex();
