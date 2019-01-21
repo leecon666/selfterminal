@@ -54,7 +54,7 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             map.put("areaid", selfTerminal.getAreaid());
             map.put("version", selfTerminal.getVersion());
             map.put("ip", selfTerminal.getIp());
-            map.put("port", selfTerminal.getPort()+"");
+            map.put("port", selfTerminal.getPort() + "");
             map.put("url", selfTerminal.getUrl());
             map.put("companyId", selfTerminal.getCompanyId());
             map.put("type", selfTerminal.getType());
@@ -103,20 +103,36 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     }
                     memCachedClient.set(sn, map);
                 }
-                String oldVersion = selfTerminalMapper.querySelfTerminalBySn(sn).getVersion();
-                String versionStr = CommonUtil.formatStr(version);
-                String oldVersionStr = CommonUtil.formatStr(oldVersion);
-                if (!versionStr.equals("") && !oldVersionStr.equals("")) {
-                    if (!versionStr.equals(oldVersionStr)) {
-                        SelfTerminal selfTerminal1 = new SelfTerminal();
-                        selfTerminal1.setSn(sn);
-                        selfTerminal1.setVersion(versionStr);
-                        selfTerminal1.setUpdateTime(new Date());
-                        int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
-                        if (result > 0) {
-                            log.info("终端({})版本设置成功", sn);
+                SelfTerminal s = selfTerminalMapper.querySelfTerminalBySn(sn);
+                if (s != null) {
+                    String oldVersion = s.getVersion();
+                    if (version != null && !version.equals("")) {
+                        String versionStr = CommonUtil.formatStr(version);
+                        if (oldVersion != null && !oldVersion.equals("")) {
+                            String oldVersionStr = CommonUtil.formatStr(oldVersion);
+                            if (!versionStr.equals(oldVersionStr)) {
+                                SelfTerminal selfTerminal1 = new SelfTerminal();
+                                selfTerminal1.setSn(sn);
+                                selfTerminal1.setVersion(versionStr);
+                                selfTerminal1.setUpdateTime(new Date());
+                                int r1 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
+                                if (r1 > 0) {
+                                    log.info("终端({})版本设置成功", sn);
+                                } else {
+                                    log.info("终端({})版本设置失败", sn);
+                                }
+                            }
                         } else {
-                            log.info("终端({})版本设置失败", sn);
+                            SelfTerminal selfTerminal6 = new SelfTerminal();
+                            selfTerminal6.setSn(sn);
+                            selfTerminal6.setUpdateTime(new Date());
+                            selfTerminal6.setVersion(versionStr);
+                            int r2 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal6);
+                            if (r2 > 0) {
+                                log.info("终端({})版本设置成功", sn);
+                            } else {
+                                log.info("终端({})版本设置失败", sn);
+                            }
                         }
                     }
                 }
