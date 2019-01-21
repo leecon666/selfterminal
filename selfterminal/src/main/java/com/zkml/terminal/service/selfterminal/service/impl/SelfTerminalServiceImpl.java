@@ -114,7 +114,6 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                                 SelfTerminal selfTerminal1 = new SelfTerminal();
                                 selfTerminal1.setSn(sn);
                                 selfTerminal1.setVersion(versionStr);
-                                selfTerminal1.setUpdateTime(new Date());
                                 int r1 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
                                 if (r1 > 0) {
                                     log.info("终端({})版本设置成功", sn);
@@ -124,9 +123,8 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                             }
                         } else {
                             SelfTerminal selfTerminal6 = new SelfTerminal();
-                            selfTerminal6.setSn(sn);
-                            selfTerminal6.setUpdateTime(new Date());
                             selfTerminal6.setVersion(versionStr);
+                            selfTerminal6.setSn(sn);
                             int r2 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal6);
                             if (r2 > 0) {
                                 log.info("终端({})版本设置成功", sn);
@@ -149,7 +147,6 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     SelfTerminal selfTerminal = new SelfTerminal();
                     selfTerminal.setSn(sn);
                     selfTerminal.setStatus(0);//在线
-                    selfTerminal.setUpdateTime(new Date());
                     int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
                     if (result > 0) {
                         log.info("终端({})修改状态成功", sn);
@@ -183,7 +180,6 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 if (companyId != null && !companyId.equals("")) {
                     selfTerminal2.setCompanyId(companyId);
                 }
-                selfTerminal2.setUpdateTime(new Date());
                 int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal2);
                 if (result > 0) {
                     log.info("终端({})修改成功", sn);
@@ -204,7 +200,6 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                         if (psign != null && !psign.equals("")) {
                             selfTerminal3.setPsign(psign);
                         }
-                        selfTerminal3.setUpdateTime(new Date());
                         int column = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal3);
                         if (column > 0) {
                             log.info("终端({})修改库标识成功", sn);
