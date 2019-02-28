@@ -1,10 +1,10 @@
 package com.zkml.terminal.service.selfterminal.service.impl;
 
 import com.whalin.MemCached.MemCachedClient;
-import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
+import com.zkml.terminal.service.selfterminal.dao.ProfileTerminalMapper;
 import com.zkml.terminal.service.selfterminal.model.Message;
-import com.zkml.terminal.service.selfterminal.model.SelfTerminal;
-import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
+import com.zkml.terminal.service.selfterminal.model.ProfileTerminal;
+import com.zkml.terminal.service.selfterminal.service.IProfileTerminalService;
 import com.zkml.terminal.service.selfterminal.thread.MessageConsumer;
 import com.zkml.terminal.service.selfterminal.util.CommonUtil;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
@@ -14,18 +14,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Service("selfTerminalService")
+/**
+ * @Author: likun
+ * @Date: Created in  2019/2/27 14:46
+ * @Description:
+ */
 @Slf4j
-public class SelfTerminalServiceImpl implements ISelfTerminalService {
+@Service("profileTerminalService")
+public class ProfileTerminalServiceImpl implements IProfileTerminalService {
     @Autowired
-    private SelfTerminalMapper selfTerminalMapper;
+    private ProfileTerminalMapper profileTerminalMapper;
     @Autowired
     private MemCachedClient memCachedClient;
     @Autowired
@@ -36,41 +40,42 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     /**
+     * @param sn 终端号
      * @Description:根据终端号查询终端参数
-     * @Method: com.zkml.terminal.service.selfterminal.service.impl.SelfTerminalServiceImpl.querySelfTerminalBySn
+     * @Method: com.zkml.terminal.service.selfterminal.service.impl.ProfileTerminalServiceImpl.queryProfileTerminalBySn
      * @Author: likun
-     * @Date: 2018/12/11 10:57
-     * @param: sn终端号
+     * @Date: 2019/2/27 14:47
      */
     @Override
-    public Map<String, String> querySelfTerminalBySn(String sn) {
+    public Map<String, String> queryProfileTerminalBySn(String sn) {
         if (memCachedClient.keyExists(sn)) {
             Object obj = memCachedClient.get(sn);
             return (Map<String, String>) obj;
         }
-        SelfTerminal selfTerminal = selfTerminalMapper.querySelfTerminalBySn(sn);
-        Map<String, String> map = new HashMap<>();
-        if (selfTerminal != null) {
-            map.put("areaid", selfTerminal.getAreaid());
-            map.put("version", selfTerminal.getVersion());
-            map.put("ip", selfTerminal.getIp());
-            map.put("port", selfTerminal.getPort() + "");
-            map.put("url", selfTerminal.getUrl());
-            map.put("companyId", selfTerminal.getCompanyId());
-            map.put("type", selfTerminal.getType());
-            memCachedClient.add(sn, map);
+        ProfileTerminal profileTerminal = profileTerminalMapper
+                .selectProfileTerminalBySn(sn);
+        Map<String, String> resultMap = new HashMap<>();
+        if (profileTerminal != null) {
+            resultMap.put("areaid", profileTerminal.getAreaid());
+            resultMap.put("version", profileTerminal.getVersion());
+            resultMap.put("ip", profileTerminal.getIp());
+            resultMap.put("port", profileTerminal.getPort() + "");
+            resultMap.put("url", profileTerminal.getUrl());
+            resultMap.put("type", profileTerminal.getType());
+            resultMap.put("companyId", profileTerminal.getCompanyId());
+            memCachedClient.add(sn, resultMap);
         } else {
             log.error("未查询到该终端号({})的配置信息", sn);
         }
-        return map;
+        return resultMap;
     }
 
     /**
+     * @param message
      * @Description:终端参数设置
-     * @Method: com.zkml.terminal.service.selfterminal.service.impl.SelfTerminalServiceImpl.updateByPrimaryKeySelective
+     * @Method: com.zkml.terminal.service.selfterminal.service.impl.ProfileTerminalServiceImpl.settingTerminalParams
      * @Author: likun
-     * @Date: 2018/12/11 11:58
-     * @param: message
+     * @Date: 2019/2/27 15:22
      */
     @Transactional
     @Override
@@ -90,17 +95,17 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
             {
                 Map<String, String> map = new HashMap<>();
-                if (cpuUsageRate != null) {
-                    map.put("cpuUsageRate", cpuUsageRate + "");
-                }
-                if (memoryUsageRate != null) {
-                    map.put("memoryUsageRate", memoryUsageRate + "");
-                }
                 if (time != null && !time.equals("")) {
                     map.put("time", time);
                 }
                 if (version != null && !version.equals("")) {
                     map.put("version", version);
+                }
+                if (cpuUsageRate != null) {
+                    map.put("cpuUsageRate", cpuUsageRate + "");
+                }
+                if (memoryUsageRate != null) {
+                    map.put("memoryUsageRate", memoryUsageRate + "");
                 }
                 Object obj = memCachedClient.get(sn);
                 if (obj != null) {
@@ -108,18 +113,18 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                 } else {
                     memCachedClient.add(sn, map);
                 }
-                SelfTerminal s = selfTerminalMapper.querySelfTerminalBySn(sn);
-                if (s != null) {
-                    String oldVersion = s.getVersion();
+                ProfileTerminal p = profileTerminalMapper.selectProfileTerminalBySn(sn);
+                if (p != null) {
+                    String oldVersion = p.getVersion();
                     if (version != null && !version.equals("")) {
                         String versionStr = CommonUtil.formatStr(version);
                         if (oldVersion != null && !oldVersion.equals("")) {
                             String oldVersionStr = CommonUtil.formatStr(oldVersion);
                             if (!versionStr.equals(oldVersionStr)) {
-                                SelfTerminal selfTerminal1 = new SelfTerminal();
-                                selfTerminal1.setSn(sn);
-                                selfTerminal1.setVersion(versionStr);
-                                int r1 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal1);
+                                ProfileTerminal profileTerminal = new ProfileTerminal();
+                                profileTerminal.setSn(sn);
+                                profileTerminal.setVersion(versionStr);
+                                int r1 = profileTerminalMapper.updateProfileTerminal(profileTerminal);
                                 if (r1 > 0) {
                                     log.info("终端({})版本设置成功", sn);
                                 } else {
@@ -127,10 +132,10 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                                 }
                             }
                         } else {
-                            SelfTerminal selfTerminal6 = new SelfTerminal();
-                            selfTerminal6.setVersion(versionStr);
-                            selfTerminal6.setSn(sn);
-                            int r2 = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal6);
+                            ProfileTerminal profileTerminal = new ProfileTerminal();
+                            profileTerminal.setVersion(versionStr);
+                            profileTerminal.setSn(sn);
+                            int r2 = profileTerminalMapper.updateProfileTerminal(profileTerminal);
                             if (r2 > 0) {
                                 log.info("终端({})版本设置成功", sn);
                             } else {
@@ -149,10 +154,10 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                     }
                 }
                 if (flag) {
-                    SelfTerminal selfTerminal = new SelfTerminal();
-                    selfTerminal.setSn(sn);
-                    selfTerminal.setStatus(0);//在线
-                    int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal);
+                    ProfileTerminal profileTerminal = new ProfileTerminal();
+                    profileTerminal.setSn(sn);
+                    profileTerminal.setStatus(0);//在线
+                    int result = profileTerminalMapper.updateProfileTerminal(profileTerminal);
                     if (result > 0) {
                         log.info("终端({})修改状态成功", sn);
                     } else {
@@ -167,27 +172,27 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
             }
             case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
             {
-                SelfTerminal selfTerminal2 = new SelfTerminal();
-                selfTerminal2.setSn(sn);
+                ProfileTerminal profileTerminal = new ProfileTerminal();
+                profileTerminal.setSn(sn);
                 if (url != null && !url.equals("")) {
-                    selfTerminal2.setUrl(url);
+                    profileTerminal.setUrl(url);
                 }
                 if (ip != null && !sn.equals("")) {
-                    selfTerminal2.setIp(ip);
+                    profileTerminal.setIp(ip);
                 }
                 if (port != null) {
-                    selfTerminal2.setPort(port);
+                    profileTerminal.setPort(port);
                 }
                 if (areaid != null && !areaid.equals("")) {
                     if (areaid.indexOf("ppp") != -1 || areaid.indexOf("ccc") != -1) {
                         areaid = areaid.substring(0, areaid.length() - 3);
                     }
-                    selfTerminal2.setAreaid(areaid);
+                    profileTerminal.setAreaid(areaid);
                 }
                 if (companyId != null && !companyId.equals("")) {
-                    selfTerminal2.setCompanyId(companyId);
+                    profileTerminal.setCompanyId(companyId);
                 }
-                int result = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal2);
+                int result = profileTerminalMapper.updateProfileTerminal(profileTerminal);
                 if (result > 0) {
                     log.info("终端({})修改成功", sn);
                 } else {
@@ -204,12 +209,12 @@ public class SelfTerminalServiceImpl implements ISelfTerminalService {
                         Object o = memCachedClient.get(settingKey);
                         Map<String, String> map = (Map<String, String>) o;
                         String psign = map.get("psign");
-                        SelfTerminal selfTerminal3 = new SelfTerminal();
-                        selfTerminal3.setSn(sn);
+                        ProfileTerminal profileTerminal6 = new ProfileTerminal();
+                        profileTerminal6.setSn(sn);
                         if (psign != null && !psign.equals("")) {
-                            selfTerminal3.setPsign(psign);
+                            profileTerminal6.setPsign(psign);
                         }
-                        int column = selfTerminalMapper.updateByPrimaryKeySelective(selfTerminal3);
+                        int column = profileTerminalMapper.updateProfileTerminal(profileTerminal6);
                         if (column > 0) {
                             log.info("终端({})修改库标识成功", sn);
                         } else {

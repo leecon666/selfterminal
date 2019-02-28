@@ -70,7 +70,7 @@ public class ParseMessageUtil {
                     default:
                         break;
                 }
-                if(messageId.equals(MessageIdUtil.SETTING_PARAMETERS)&&result==0){
+                if (messageId.equals(MessageIdUtil.SETTING_PARAMETERS) && result == 0) {
                     message.setFlag(true);
                 }
                 log.info(sb.toString());

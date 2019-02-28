@@ -4,9 +4,13 @@ import com.zkml.terminal.service.selfterminal.model.Message;
 
 import java.util.Map;
 
-
-public interface ISelfTerminalService {
-    Map<String, String> querySelfTerminalBySn(String sn);
+/**
+ * @Author: likun
+ * @Date: Created in  2019/2/27 14:34
+ * @Description:
+ */
+public interface IProfileTerminalService {
+    Map<String, String> queryProfileTerminalBySn(String sn);
 
     void settingTerminalParams(Message message);
 }

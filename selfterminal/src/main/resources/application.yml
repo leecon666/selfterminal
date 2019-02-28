@@ -59,7 +59,7 @@ netty:
   reuseaddr: true #地址复用，默认值False
   sndBuf: 10485760 # Socket参数，TCP数据发送缓冲区大小
   revBuf: 10485760 # Socket参数，TCP数据接收缓冲区大小
-  #memcached缓存配置
+#memcached缓存配置
 memcached:
   servers: 36.7.87.75:11211  #服务器列表
   weight: 5  #权重
@@ -75,7 +75,7 @@ dubbo:
   application:
     name: selfterminal
   registry:
-    address: zookeeper://192.168.15.209:2181
+    address: zookeeper://36.7.87.75:2181
   protocol:
     name: dubbo
     port: 20880

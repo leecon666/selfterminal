@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper">
-    <resultMap id="BaseResultMap"
-               type="com.zkml.terminal.service.selfterminal.model.SelfTerminal">
+<mapper namespace="com.zkml.terminal.service.selfterminal.dao.ProfileTerminalMapper">
+    <resultMap id="BaseResultMap" type="com.zkml.terminal.service.selfterminal.model.ProfileTerminal">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="sn" jdbcType="VARCHAR" property="sn"/>
         <result column="type" jdbcType="VARCHAR" property="type"/>
@@ -23,17 +22,17 @@
         <result column="psign" jdbcType="VARCHAR" property="psign"/>
     </resultMap>
     <!--根据终端号查询自助终端-->
-    <select id="querySelfTerminalBySn" parameterType="java.lang.String" resultMap="BaseResultMap">
-        select
+    <select id="selectProfileTerminalBySn" parameterType="string" resultMap="BaseResultMap">
+          select
           id, sn, type, version, status , areaid,
           ip, port, url, logic_delete,company_id
-        from self_terminal
+        from profile_terminal
         where sn = #{sn,jdbcType=VARCHAR} and logic_delete=0
     </select>
     <!--终端参数设置-->
-    <update id="updateByPrimaryKeySelective"
-            parameterType="com.zkml.terminal.service.selfterminal.model.SelfTerminal">
-        update self_terminal
+    <update id="updateProfileTerminal"
+            parameterType="com.zkml.terminal.service.selfterminal.model.ProfileTerminal">
+        update profile_terminal
         <set>
             <if test="version != null">
                 version = #{version,jdbcType=VARCHAR},
