@@ -5,6 +5,7 @@ import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
 import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMoldMapper;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import com.zkml.terminal.service.selfterminal.model.SelfTerminalMold;
+import com.zkml.terminal.service.selfterminal.service.IBookTerminalService;
 import com.zkml.terminal.service.selfterminal.service.IProfileTerminalService;
 import com.zkml.terminal.service.selfterminal.service.ISelfTerminalService;
 import com.zkml.terminal.service.selfterminal.util.MessageIdUtil;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +44,9 @@ public class SelfTerminalServiceThread implements Runnable {
     @Autowired
     @Qualifier("profileTerminalService")
     private IProfileTerminalService profileTerminalService;
+    @Autowired
+    @Qualifier("bookTerminalService")
+    private IBookTerminalService bookTerminalService;
     private String command;
     private ChannelHandlerContext ctx;
     public static Map<String, Channel> map = new ConcurrentHashMap<>();//解决多线程冲突
@@ -124,7 +129,29 @@ public class SelfTerminalServiceThread implements Runnable {
                             }
                             break;
                         }
-                        case "meeting": {//会议
+                        case "book": {//书柜
+                            Map<String, String> resultMap=bookTerminalService.queryBookTerminalBySn(sn);
+                            if(!CollectionUtils.isEmpty(resultMap)){
+                                map.put(sn, ctx.channel());
+                                switch (message.getMessageId()) {
+                                    case MessageIdUtil.REPORT_ON_TIME:// 终端定时上报
+                                        ParseMessageUtil.parseMessage(message);
+                                        bookTerminalService.settingTerminalParams(message);
+                                        break;
+                                    case MessageIdUtil.GENERAL_RESPONSE://终端通用应答
+                                        ParseMessageUtil.parseMessage(message);
+                                        bookTerminalService.settingTerminalParams(message);
+                                        break;
+                                    case MessageIdUtil.REPLY_QUERY_PARAMETERS:// 查询终端参数应答
+                                        ParseMessageUtil.parseMessage(message);
+                                        bookTerminalService.settingTerminalParams(message);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }else {
+                                log.error("未查到({})终端的配置信息", sn);
+                            }
                             break;
                         }
                         case "sign": {//签批

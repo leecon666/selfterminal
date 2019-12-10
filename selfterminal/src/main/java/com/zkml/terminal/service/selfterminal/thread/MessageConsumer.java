@@ -1,9 +1,11 @@
 package com.zkml.terminal.service.selfterminal.thread;
 
 import com.whalin.MemCached.MemCachedClient;
+import com.zkml.terminal.service.selfterminal.dao.BookTerminalMapper;
 import com.zkml.terminal.service.selfterminal.dao.ProfileTerminalMapper;
 import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMapper;
 import com.zkml.terminal.service.selfterminal.dao.SelfTerminalMoldMapper;
+import com.zkml.terminal.service.selfterminal.dto.BookTerminalDto;
 import com.zkml.terminal.service.selfterminal.model.Message;
 import com.zkml.terminal.service.selfterminal.model.ProfileTerminal;
 import com.zkml.terminal.service.selfterminal.model.SelfTerminal;
@@ -36,6 +38,8 @@ public class MessageConsumer implements Runnable {
     private ProfileTerminalMapper profileTerminalMapper;
     @Autowired
     private MemCachedClient memCachedClient;
+    @Autowired
+    private BookTerminalMapper bookTerminalMapper;
 
     @Override
     public void run() {
@@ -87,7 +91,17 @@ public class MessageConsumer implements Runnable {
                                     SelfTerminalServiceThread.map.remove(sn);
                                     break;
                                 }
-                                case "meeting": {//会议
+                                case "book": {//书柜
+                                    BookTerminalDto bookTerminalDto = new BookTerminalDto();
+                                    bookTerminalDto.setSn(sn);
+                                    bookTerminalDto.setStatus(1);//离线
+                                    int result = bookTerminalMapper.updateBookTerminal(bookTerminalDto);
+                                    if (result > 0) {
+                                        log.info("终端({})修改状态成功", sn);
+                                    } else {
+                                        log.info("终端({})修改状态失败", sn);
+                                    }
+                                    SelfTerminalServiceThread.map.remove(sn);
                                     break;
                                 }
                                 case "sign": {//签批

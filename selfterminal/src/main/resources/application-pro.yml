@@ -3,6 +3,13 @@ zkml:
  name: ZKML
  copyrightYear: 2018
 
+#开发环境配置
+server:
+  #端口
+  port: 8090
+  tomcat:
+    uri-encoding: utf-8
+
 #druid配置
 spring:
   datasource:

@@ -3,14 +3,21 @@ zkml:
  name: ZKML
  copyrightYear: 2018
 
+#开发环境配置
+server:
+  #端口
+  port: 8090
+  tomcat:
+    uri-encoding: utf-8
+
 #druid配置
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://36.7.87.75:3308/vbox-maintenance?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://10.5.4.240:33891/zkml_vbox_beta?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true
+    username: izkml_vbox
+    password: izkml@123
     # 初始化大小，最小，最大
     initialSize: 1
     minIdle: 3
@@ -61,7 +68,7 @@ netty:
   revBuf: 10485760 # Socket参数，TCP数据接收缓冲区大小
 #memcached缓存配置
 memcached:
-  servers: 36.7.87.75:11211  #服务器列表
+  servers: 10.5.4.234:13956  #服务器列表
   weight: 5  #权重
   initConn: 20  #初始化连接数
   minConn: 10  #最小连接数
@@ -75,7 +82,7 @@ dubbo:
   application:
     name: selfterminal
   registry:
-    address: zookeeper://36.7.87.75:2181
+    address: zookeeper://10.5.4.240:2181
   protocol:
     name: dubbo
     port: 20880
