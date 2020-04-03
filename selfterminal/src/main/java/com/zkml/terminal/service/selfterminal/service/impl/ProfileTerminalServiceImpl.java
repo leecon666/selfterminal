@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.DelayQueue;
@@ -38,6 +40,7 @@ public class ProfileTerminalServiceImpl implements IProfileTerminalService {
     // 创建延时队列
     DelayQueue<Message> queue = new DelayQueue<>();
     ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private static final SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * @param sn 终端号
@@ -85,7 +88,7 @@ public class ProfileTerminalServiceImpl implements IProfileTerminalService {
         String version = CommonUtil.formatStr(message.getVersion());
         Integer cpuUsageRate = message.getCpuUsageRate();
         Integer memoryUsageRate = message.getMemoryUsageRate();
-        String time = message.getTime();
+        String time = format.format(new Date());
         String url = CommonUtil.formatStr(message.getUrl());
         String ip = CommonUtil.formatStr(message.getIp());
         Integer port = message.getPort();
